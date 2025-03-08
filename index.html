@@ -242,6 +242,9 @@
             const celestial = document.getElementById('celestialBody');
             let gradient;
 
+            // Dubai sunrise/sunset times (approximate averages)
+            // Sunrise: ~6:30 AM (6.5 hours), Sunset: ~6:30 PM (18.5 hours)
+            // Day length: ~12 hours, Night: ~12 hours
             if (hours >= 5 && hours < 7) {
                 gradient = 'linear-gradient(to bottom, #ff8c5a, #ffd700)';
                 celestial.textContent = '☀️';
@@ -258,19 +261,31 @@
 
             document.body.style.background = gradient;
 
-            let progress, topPosition, leftPosition;
-            if (hours >= 5 && hours < 19) {
-                progress = (totalMinutes - 5 * 60) / (14 * 60);
+            // Calculate progress (0 to 1) across the day/night
+            let progress;
+            const sunrise = 6.5 * 60;  // 6:30 AM in minutes
+            const sunset = 18.5 * 60;  // 6:30 PM in minutes
+            const dayLength = sunset - sunrise;
+            const nightLength = 1440 - dayLength;
+
+            if (hours >= 6.5 && hours < 18.5) {
+                // Daytime (sun movement)
+                progress = (totalMinutes - sunrise) / dayLength;
             } else {
-                progress = (totalMinutes >= 19 * 60 ? totalMinutes - 19 * 60 : totalMinutes + 5 * 60) / (10 * 60);
+                // Nighttime (moon movement)
+                const nightMinutes = totalMinutes < sunrise ? totalMinutes + (1440 - sunset) : totalMinutes - sunset;
+                progress = nightMinutes / nightLength;
             }
 
-            leftPosition = 10 + progress * 80;
-            const a = 80;
-            const h = 20;
-            const x = progress - 0.5;
-            topPosition = -a * x * x + h;
+            // Position calculations
+            // Left: 0vw (start) to 100vw (end)
+            // Top: Using parabolic arc: -4h(x-0.5)² + h where h is max height
+            const leftPosition = progress * 100;  // 0 to 100vw
+            const maxHeight = 10;  // Highest point at 10vh from top
+            const x = progress - 0.5;  // Center at 0.5 (screen middle)
+            const topPosition = -4 * maxHeight * x * x + maxHeight;
 
+            // Avoid container overlap
             const container = document.querySelector('.container');
             const containerRect = container.getBoundingClientRect();
             const containerTop = containerRect.top / window.innerHeight * 100;
@@ -278,12 +293,13 @@
             const containerLeft = containerRect.left / window.innerWidth * 100;
             const containerRight = containerRect.right / window.innerWidth * 100;
 
+            let adjustedTop = topPosition;
             if (topPosition + 5 > containerTop && topPosition < containerBottom &&
                 leftPosition > containerLeft - 10 && leftPosition < containerRight + 10) {
-                topPosition = containerTop - 10;
+                adjustedTop = containerTop - 10;
             }
 
-            celestial.style.top = `${topPosition}vh`;
+            celestial.style.top = `${adjustedTop}vh`;
             celestial.style.left = `${leftPosition}vw`;
         }
 
@@ -316,21 +332,18 @@
             const remainingMinutes = timeDifference;
             
             // Cambio específico a rojo en 5 segundos cuando quedan exactamente 3 minutos
-            if (remainingMinutes <= 3 && remainingMinutes > 2.9167) { // 2.9167 = 3 minutes - 5 seconds
-                // Iniciar transición de 5 segundos a rojo
+            if (remainingMinutes <= 3 && remainingMinutes > 2.9167) {
                 progressFill.style.transition = 'background-color 5s linear';
                 progressFill.style.backgroundColor = 'rgb(255, 0, 0)';
             } else if (remainingMinutes > 3) {
-                // Color normal basado en progreso
                 const startColor = 204;
                 const endColor = 51;
                 const colorValue = Math.round(startColor - (startColor - endColor) * (percentage / 100));
                 progressFill.style.backgroundColor = `rgb(${colorValue}, ${colorValue}, ${colorValue})`;
                 progressFill.style.transition = 'background-color 0.5s linear';
             } else if (remainingMinutes <= 2.9167) {
-                // Mantener rojo completo después de la transición
                 progressFill.style.backgroundColor = 'rgb(255, 0, 0)';
-                progressFill.style.transition = 'none'; // Evitar transiciones adicionales
+                progressFill.style.transition = 'none';
             }
 
             document.getElementById('busEmoji').style.left = `${busPosition}px`;
