@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Grosvenor</title>
+    <title>DSO 2</title>
     <link rel="apple-touch-icon" href="https://img.icons8.com/?size=100&id=fRKgJhBjMqCd&format=png&color=000000">
     <link rel="apple-touch-startup-image" href="https://example.com/splash.png">
     <style>
@@ -89,6 +89,8 @@
             position: absolute;
             transition: all 1s ease;
             z-index: 1;
+            opacity: 1;
+            pointer-events: none;
         }
         .dunes {
             position: absolute;
@@ -243,8 +245,6 @@
             let gradient;
 
             // Dubai sunrise/sunset times (approximate averages)
-            // Sunrise: ~6:30 AM (6.5 hours), Sunset: ~6:30 PM (18.5 hours)
-            // Day length: ~12 hours, Night: ~12 hours
             if (hours >= 5 && hours < 7) {
                 gradient = 'linear-gradient(to bottom, #ff8c5a, #ffd700)';
                 celestial.textContent = '☀️';
@@ -277,13 +277,19 @@
                 progress = nightMinutes / nightLength;
             }
 
+            // Ensure progress stays between 0 and 1
+            progress = Math.max(0, Math.min(1, progress));
+
             // Position calculations
-            // Left: 0vw (start) to 100vw (end)
-            // Top: Using parabolic arc: -4h(x-0.5)² + h where h is max height
-            const leftPosition = progress * 100;  // 0 to 100vw
-            const maxHeight = 10;  // Highest point at 10vh from top
-            const x = progress - 0.5;  // Center at 0.5 (screen middle)
-            const topPosition = -4 * maxHeight * x * x + maxHeight;
+            // X: Linear from 0vw (left) to 100vw (right)
+            const leftPosition = progress * 100;
+
+            // Y: Parabolic path from 100vh (bottom) to 10vh (top) back to 100vh
+            // Using y = 4h(x-0.5)² + k where h controls height, k is min height
+            const maxHeight = 90;  // Distance from bottom (100vh) to top (10vh)
+            const minHeight = 10;  // Minimum height from top
+            const x = progress - 0.5;
+            const topPosition = 4 * maxHeight * x * x + minHeight;
 
             // Avoid container overlap
             const container = document.querySelector('.container');
@@ -299,8 +305,10 @@
                 adjustedTop = containerTop - 10;
             }
 
+            // Apply positions
             celestial.style.top = `${adjustedTop}vh`;
             celestial.style.left = `${leftPosition}vw`;
+            celestial.style.display = 'block';
         }
 
         function updateCountdown() {
@@ -328,10 +336,7 @@
             const progressFill = document.getElementById('progressFill');
             progressFill.style.width = `${Math.min(Math.max(percentage, 0), 100)}%`;
 
-            // Calcular minutos restantes
             const remainingMinutes = timeDifference;
-            
-            // Cambio específico a rojo en 5 segundos cuando quedan exactamente 3 minutos
             if (remainingMinutes <= 3 && remainingMinutes > 2.9167) {
                 progressFill.style.transition = 'background-color 5s linear';
                 progressFill.style.backgroundColor = 'rgb(255, 0, 0)';
@@ -370,6 +375,7 @@
             generateRandomDune();
             document.body.style.height = window.innerHeight + 'px';
             window.scrollTo(0, 0);
+            updateSkyAndCelestial();
         };
 
         setInterval(updateCountdown, 100);
