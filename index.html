@@ -2,19 +2,23 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>DSO 2</title>
     <link rel="apple-touch-icon" href="https://img.icons8.com/?size=100&id=fRKgJhBjMqCd&format=png&color=000000">
     <link rel="apple-touch-startup-image" href="https://example.com/splash.png">
     <style>
         html, body {
-            height: 100%;
-            width: 100%;
+            height: 100vh;
+            width: 100vw;
             margin: 0;
             padding: 0;
             overflow: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: #191970;
         }
         body {
             font-family: Helvetica, Arial, sans-serif;
@@ -23,6 +27,10 @@
             align-items: center;
             transition: background 1s ease;
             position: relative;
+            background-size: cover;
+            background-position: center;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
         }
         .emirates-logo {
             position: fixed;
@@ -88,7 +96,7 @@
             font-size: 60px;
             position: absolute;
             transition: all 1s ease;
-            z-index: 3; /* Cambiado a 3 para estar por encima del contenedor */
+            z-index: 1;
             opacity: 1;
             pointer-events: none;
         }
@@ -114,19 +122,18 @@
         #toggleRoute:hover {
             transform: rotate(180deg);
         }
-        /* Estilos para las estrellas */
         .stars-container {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 75vh; /* Limitar a la parte superior, dejando las dunas libres */
-            z-index: 0; /* Por debajo de las dunas */
+            height: 75vh;
+            z-index: 0;
             pointer-events: none;
         }
         .star {
             position: absolute;
-            background-color: rgba(255, 255, 255, 0.3); /* Baja opacidad */
+            background-color: rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             animation: fade 3s infinite;
         }
@@ -156,11 +163,11 @@
     <svg class="dunes" viewBox="0 0 1000 250" preserveAspectRatio="none">
         <path id="dunePath" fill="rgba(237, 201, 175, 0.4)" />
     </svg>
-    <div class="stars-container" id="starsContainer"></div> <!-- Contenedor para las estrellas -->
+    <div class="stars-container" id="starsContainer"></div>
 
     <script>
         let dunePoints = [];
-        let isGrosvenorToHQ = true;
+        let isDso2ToHQ = true;
 
         const dso2ToHQSchedule = [
             "00:29", "00:44", "00:59", "01:14", "01:24", "01:39", "01:54", "02:09", "02:24", "02:44",
@@ -226,7 +233,7 @@
         }
 
         function getBusTimes() {
-            const currentSchedule = isGrosvenorToHQ ? dso2ToHQSchedule : hqToDso2Schedule;
+            const currentSchedule = isDso2ToHQ ? dso2ToHQSchedule : hqToDso2Schedule;
             const now = new Date();
             const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes() + (now.getSeconds() + now.getMilliseconds() / 1000) / 60;
             let previousBus = { time: currentSchedule[currentSchedule.length - 1], minutes: 0 };
@@ -259,61 +266,73 @@
         }
 
         function updateSkyAndCelestial() {
+            // Obtener hora actual en Dubái (UTC+4)
             const now = new Date();
-            const hours = now.getHours();
-            const minutes = now.getMinutes();
+            const utcOffset = 4 * 60; // Dubái está en UTC+4
+            const dubaiTime = new Date(now.getTime() + utcOffset * 60 * 1000);
+            const hours = dubaiTime.getHours();
+            const minutes = dubaiTime.getMinutes();
             const totalMinutes = hours * 60 + minutes;
+
             const celestial = document.getElementById('celestialBody');
             let gradient;
 
-            // Dubai sunrise/sunset times (approximate averages)
-            if (hours >= 5 && hours < 7) {
-                gradient = 'linear-gradient(to bottom, #ff8c5a, #ffd700)';
-                celestial.textContent = '☀️';
-            } else if (hours >= 7 && hours < 17) {
+            // Horarios aproximados de amanecer y atardecer en Dubái (ajustados a marzo)
+            const sunrise = 6.5 * 60; // 06:30
+            const sunset = 18.5 * 60; // 18:30
+            const dayLength = sunset - sunrise; // Duración del día
+            const nightLength = 1440 - dayLength; // Duración de la noche
+
+            // Determinar si es día o noche y asignar cuerpo celeste
+            if (totalMinutes >= sunrise && totalMinutes < sunset) {
                 gradient = 'linear-gradient(to bottom, #87cefa, #4682b4)';
-                celestial.textContent = '☀️';
-            } else if (hours >= 17 && hours < 19) {
-                gradient = 'linear-gradient(to bottom, #ff4500, #8b0000)';
-                celestial.textContent = '☀️';
+                celestial.textContent = '☀️'; // Sol
             } else {
                 gradient = 'linear-gradient(to bottom, #191970, #000080)';
-                celestial.textContent = '🌙';
+                celestial.textContent = '🌙'; // Luna
             }
-
             document.body.style.background = gradient;
 
-            // Calculate progress (0 to 1) across the day/night
+            // Calcular progreso en el día o la noche
             let progress;
-            const sunrise = 6.5 * 60;  // 6:30 AM in minutes
-            const sunset = 18.5 * 60;  // 6:30 PM in minutes
-            const dayLength = sunset - sunrise;
-            const nightLength = 1440 - dayLength;
-
-            if (hours >= 6.5 && hours < 18.5) {
-                // Daytime (sun movement)
-                progress = (totalMinutes - sunrise) / dayLength;
+            if (totalMinutes >= sunrise && totalMinutes < sunset) {
+                progress = (totalMinutes - sunrise) / dayLength; // Progreso del día
             } else {
-                // Nighttime (moon movement)
-                const nightMinutes = totalMinutes < sunrise ? totalMinutes + (1440 - sunset) : totalMinutes - sunset;
-                progress = nightMinutes / nightLength;
+                const nightMinutes = totalMinutes < sunrise 
+                    ? totalMinutes + (1440 - sunset) 
+                    : totalMinutes - sunset;
+                progress = nightMinutes / nightLength; // Progreso de la noche
             }
-
-            // Ensure progress stays between 0 and 1
             progress = Math.max(0, Math.min(1, progress));
 
-            // Position calculations
-            // X: Linear from 0vw (left) to 100vw (right)
-            const leftPosition = progress * 100;
+            // Obtener dimensiones del contenedor para evitarlo
+            const container = document.querySelector('.container');
+            const containerRect = container.getBoundingClientRect();
+            const containerWidth = containerRect.width / window.innerWidth * 100; // % en vw
+            const containerHeight = containerRect.height / window.innerHeight * 100; // % en vh
+            const containerLeft = containerRect.left / window.innerWidth * 100;
+            const containerTop = containerRect.top / window.innerHeight * 100;
+            const containerRight = containerLeft + containerWidth;
+            const containerBottom = containerTop + containerHeight;
 
-            // Y: Parabolic path with peak at the top center
-            const maxHeight = 100; // From bottom (100vh) to top (0vh)
-            const x = progress - 0.5; // Center the parabola at 0.5 (50vw)
-            const topPosition = 4 * maxHeight * x * x; // Parabola equation
+            // Definir trayectoria parabólica
+            const startX = 0; // Esquina inferior izquierda
+            const endX = 100; // Esquina inferior derecha
+            const startY = 100; // Parte inferior de la pantalla
+            const endY = 100; // Parte inferior de la pantalla
+            const maxHeight = containerTop - 20; // Altura máxima ajustada
 
-            // Apply positions
-            celestial.style.top = `${topPosition}vh`;
+            // Calcular posición X (lineal de izquierda a derecha)
+            const leftPosition = startX + (endX - startX) * progress;
+
+            // Calcular posición Y (parábola que evita el contenedor)
+            const h = 50; // Punto medio en X
+            const a = (startY - maxHeight) / Math.pow(h - startX, 2); // Coeficiente parabólico
+            const topPosition = a * Math.pow(leftPosition - h, 2) + maxHeight;
+
+            // Aplicar posición al cuerpo celeste
             celestial.style.left = `${leftPosition}vw`;
+            celestial.style.top = `${topPosition}vh`;
             celestial.style.display = 'block';
         }
 
@@ -362,27 +381,24 @@
             updateSkyAndCelestial();
         }
 
-        // Función para generar estrellas
         function createStars() {
             const starsContainer = document.getElementById('starsContainer');
-            const numberOfStars = 50; // Ajusta la cantidad de estrellas
+            const numberOfStars = 50;
 
             for (let i = 0; i < numberOfStars; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
 
-                // Posición aleatoria
-                const x = Math.random() * 100; // 0% a 100% del ancho
-                const y = Math.random() * 75; // 0% a 75% de la altura (por encima de las dunas)
-                const size = Math.random() * 3 + 1; // Tamaño entre 1px y 4px
+                const x = Math.random() * 100;
+                const y = Math.random() * 75;
+                const size = Math.random() * 3 + 1;
 
                 star.style.left = `${x}vw`;
                 star.style.top = `${y}vh`;
                 star.style.width = `${size}px`;
                 star.style.height = `${size}px`;
 
-                // Retardo aleatorio para la animación
-                const delay = Math.random() * 3; // Retardo entre 0 y 3 segundos
+                const delay = Math.random() * 3;
                 star.style.animationDelay = `${delay}s`;
 
                 starsContainer.appendChild(star);
@@ -390,11 +406,11 @@
         }
 
         document.getElementById('toggleRoute').addEventListener('click', function() {
-            isGrosvenorToHQ = !isGrosvenorToHQ;
+            isDso2ToHQ = !isDso2ToHQ;
             const routeTitle = document.getElementById('routeTitle');
             const toggleButton = document.getElementById('toggleRoute');
             
-            if (isGrosvenorToHQ) {
+            if (isDso2ToHQ) {
                 routeTitle.textContent = "DSO 2 to HQ in";
                 toggleButton.textContent = "🔄";
             } else {
@@ -409,7 +425,7 @@
             document.body.style.height = window.innerHeight + 'px';
             window.scrollTo(0, 0);
             updateSkyAndCelestial();
-            createStars(); // Generar las estrellas al cargar la página
+            createStars();
         };
 
         setInterval(updateCountdown, 100);
