@@ -8,7 +8,7 @@
     <title>Grosvenor</title>
     <link rel="apple-touch-icon" href="https://img.icons8.com/?size=100&id=fRKgJhBjMqCd&format=png&color=000000">
     <link rel="apple-touch-startup-image" href="https://example.com/splash.png">
-    <script type="text/javascript" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+    <script src="//www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
     <style>
         html, body {
             height: 100%;
@@ -374,60 +374,67 @@
             updateCountdown();
         });
 
-        document.getElementById('chromecastBtn').addEventListener('click', function() {
-            if (!window.castReceiver) {
+        // Chromecast Configuration
+        window['__onGCastApiAvailable'] = function(isAvailable) {
+            if (isAvailable) {
+                console.log('Chromecast API cargada');
                 initializeCastApi();
             } else {
-                launchChromecast();
+                console.error('Chromecast API no disponible');
             }
-        });
+        };
 
         function initializeCastApi() {
             const sessionRequest = new chrome.cast.SessionRequest(chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID);
             const apiConfig = new chrome.cast.ApiConfig(
                 sessionRequest,
-                sessionListener,
-                receiverListener
+                (session) => {
+                    console.log('Sesión establecida:', session);
+                    window.castSession = session;
+                },
+                (availability) => {
+                    console.log('Disponibilidad de receptores:', availability);
+                    if (availability === chrome.cast.ReceiverAvailability.AVAILABLE) {
+                        document.getElementById('chromecastBtn').style.opacity = '0.8'; // Indica que hay dispositivos
+                    }
+                }
             );
-            
+
             chrome.cast.initialize(apiConfig, 
-                () => console.log('Cast initialized'),
-                (err) => console.error('Cast init error:', err)
+                () => console.log('Chromecast inicializado correctamente'),
+                (err) => console.error('Error al inicializar Chromecast:', err)
             );
         }
 
-        function sessionListener(session) {
-            console.log('New session:', session);
-            window.castSession = session;
-        }
-
-        function receiverListener(availability) {
-            if (availability === chrome.cast.ReceiverAvailability.AVAILABLE) {
-                console.log('Chromecast devices available');
+        document.getElementById('chromecastBtn').addEventListener('click', function() {
+            console.log('Botón Chromecast clicado');
+            if (!chrome.cast || !chrome.cast.isAvailable) {
+                console.error('Chromecast no está disponible aún');
+                return;
             }
-        }
 
-        function launchChromecast() {
             if (!window.castSession) {
                 chrome.cast.requestSession(
                     (session) => {
                         window.castSession = session;
-                        loadMedia();
+                        console.log('Sesión iniciada:', session);
+                        castContent();
                     },
-                    (err) => console.error('Session error:', err)
+                    (err) => console.error('Error al solicitar sesión:', err)
                 );
             } else {
-                loadMedia();
+                castContent();
             }
-        }
+        });
 
-        function loadMedia() {
+        function castContent() {
             const mediaInfo = new chrome.cast.media.MediaInfo(window.location.href, 'text/html');
             const request = new chrome.cast.media.LoadRequest(mediaInfo);
-            
+            request.autoplay = true;
+
             window.castSession.loadMedia(request,
-                (media) => console.log('Media loaded successfully'),
-                (err) => console.error('Load media error:', err)
+                (media) => console.log('Contenido enviado al Chromecast:', media),
+                (err) => console.error('Error al cargar contenido:', err)
             );
         }
 
