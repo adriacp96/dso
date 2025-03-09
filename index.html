@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>DSO 2</title>
-    <link rel="apple-touch-icon" href="https://i.imghippo.com/files/gEsT1352ldA.png">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/?size=100&id=fRKgJhBjMqCd&format=png&color=000000">
     <link rel="apple-touch-startup-image" href="https://example.com/splash.png">
     <style>
         html, body {
@@ -109,15 +109,25 @@
             z-index: 1;
             pointer-events: none;
         }
-        #toggleRoute {
+        .button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px; /* Espacio entre los botones */
             margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 1.5em;
+        }
+        #toggleRoute {
+            padding: 0; /* Ajustado para igualar altura */
+            font-size: 24px; /* Igualado al tamaño del emoji */
             background-color: transparent;
             color: #2c3e50;
             border: none;
             cursor: pointer;
             transition: transform 0.3s;
+            width: 24px; /* Ancho igual a la altura para que sea cuadrado */
+            height: 24px; /* Igualado al eGateButton */
+            line-height: 24px; /* Centrado vertical */
+            box-sizing: border-box;
         }
         #toggleRoute:hover {
             transform: rotate(180deg);
@@ -142,6 +152,61 @@
             50% { opacity: 0.1; }
             100% { opacity: 0.3; }
         }
+        .input-container {
+            margin-top: 20px;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        #busTimeInput {
+            padding: 10px;
+            font-size: 1.2em;
+            border: 2px solid #2c3e50;
+            border-radius: 5px;
+            outline: none;
+            width: 120px;
+            text-align: center;
+            background-color: white;
+            color: #2c3e50;
+        }
+        #playButton {
+            padding: 5px 10px;
+            font-size: 1em;
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #playButton:hover {
+            background-color: #34495e;
+        }
+        #closestTimes {
+            margin-top: 10px;
+            font-size: 1.1em;
+            color: #2c3e50;
+            display: none;
+        }
+        #eGateButton {
+            padding: 0 20px;
+            font-size: 1.2em;
+            background: white;
+            color: #2c3e50;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            width: 100px;
+            height: 24px; /* Igualado al tamaño del emoji 🔄 */
+            line-height: 24px;
+            box-sizing: border-box;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        #eGateButton:hover {
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
@@ -157,7 +222,16 @@
             </div>
             <div class="bus-emoji" id="busEmoji">🚌</div>
         </div>
-        <button id="toggleRoute">🔄</button>
+        <div class="button-container">
+            <button id="toggleRoute">🔄</button>
+            <button id="eGateButton">eGate</button>
+        </div>
+        <div class="input-container">
+            <span>eGate</span>
+            <input type="time" id="busTimeInput">
+            <button id="playButton">✕</button>
+        </div>
+        <div id="closestTimes"></div>
     </div>
     <div id="celestialBody">☀️</div>
     <svg class="dunes" viewBox="0 0 1000 250" preserveAspectRatio="none">
@@ -167,21 +241,38 @@
 
     <script>
         let dunePoints = [];
-        let isDso2ToHQ = true;
+        let isDSO2ToHQ = true;
+        let starsCreated = false;
 
         const dso2ToHQSchedule = [
-            "00:29", "00:44", "00:59", "01:14", "01:24", "01:39", "01:54", "02:09", "02:24", "02:44",
-            "03:14", "03:44", "04:14", "04:44", "04:54", "05:04", "05:19", "05:39", "05:54", "06:09",
-            "06:19", "06:39", "06:54", "07:14", "07:29", "07:49", "08:09", "08:24", "08:44", "09:04",
-            "09:24", "09:44", "10:14", "10:44", "11:04", "11:24", "11:39", "12:04", "12:19", "12:39",
-            "12:54", "13:19", "13:44", "14:04", "14:29", "14:54", "15:19", "15:44", "16:09", "16:39",
-            "17:39", "17:39", "18:04", "18:34", "19:04", "19:34", "20:04", "20:29", "20:54", "21:19",
-            "21:39", "22:04", "22:29", "22:49", "23:04", "23:29", "23:44", "23:59", "00:14"
+            { dso2: "00:29", hq: "01:05" }, { dso2: "00:44", hq: "01:40" }, { dso2: "00:59", hq: "01:35" },
+            { dso2: "01:14", hq: "01:50" }, { dso2: "01:24", hq: "02:00" }, { dso2: "01:39", hq: "02:15" },
+            { dso2: "01:54", hq: "02:30" }, { dso2: "02:09", hq: "02:45" }, { dso2: "02:24", hq: "03:00" },
+            { dso2: "02:44", hq: "03:20" }, { dso2: "03:14", hq: "03:50" }, { dso2: "03:44", hq: "04:20" },
+            { dso2: "04:14", hq: "04:50" }, { dso2: "04:44", hq: "05:20" }, { dso2: "04:54", hq: "05:30" },
+            { dso2: "05:04", hq: "05:40" }, { dso2: "05:19", hq: "05:55" }, { dso2: "05:39", hq: "06:15" },
+            { dso2: "05:54", hq: "06:34" }, { dso2: "06:09", hq: "06:49" }, { dso2: "06:19", hq: "06:59" },
+            { dso2: "06:39", hq: "07:19" }, { dso2: "06:54", hq: "07:34" }, { dso2: "07:14", hq: "07:54" },
+            { dso2: "07:29", hq: "08:09" }, { dso2: "07:49", hq: "08:29" }, { dso2: "08:09", hq: "08:49" },
+            { dso2: "08:24", hq: "09:04" }, { dso2: "08:44", hq: "09:24" }, { dso2: "09:04", hq: "09:44" },
+            { dso2: "09:24", hq: "10:04" }, { dso2: "09:44", hq: "10:24" }, { dso2: "10:14", hq: "10:54" },
+            { dso2: "10:44", hq: "11:24" }, { dso2: "11:04", hq: "11:44" }, { dso2: "11:24", hq: "12:04" },
+            { dso2: "11:39", hq: "12:19" }, { dso2: "12:04", hq: "12:44" }, { dso2: "12:19", hq: "12:59" },
+            { dso2: "12:39", hq: "13:19" }, { dso2: "12:54", hq: "13:34" }, { dso2: "13:19", hq: "13:59" },
+            { dso2: "13:44", hq: "14:24" }, { dso2: "14:04", hq: "14:44" }, { dso2: "14:29", hq: "15:09" },
+            { dso2: "14:54", hq: "15:34" }, { dso2: "15:19", hq: "15:59" }, { dso2: "15:44", hq: "16:24" },
+            { dso2: "16:09", hq: "16:52" }, { dso2: "16:39", hq: "17:22" }, { dso2: "17:39", hq: "17:52" },
+            { dso2: "17:39", hq: "18:22" }, { dso2: "18:04", hq: "18:47" }, { dso2: "18:34", hq: "19:17" },
+            { dso2: "19:04", hq: "19:47" }, { dso2: "19:34", hq: "20:17" }, { dso2: "20:04", hq: "20:47" },
+            { dso2: "20:29", hq: "21:09" }, { dso2: "20:54", hq: "21:34" }, { dso2: "21:19", hq: "21:59" },
+            { dso2: "21:39", hq: "22:19" }, { dso2: "22:04", hq: "22:44" }, { dso2: "22:29", hq: "23:09" },
+            { dso2: "22:49", hq: "23:29" }, { dso2: "23:04", hq: "23:44" }, { dso2: "23:29", hq: "00:09" },
+            { dso2: "23:44", hq: "00:24" }, { dso2: "23:59", hq: "00:39" }, { dso2: "00:14", hq: "00:50" }
         ];
 
-        const hqToDso2Schedule = [
+        const hqToDSO2Schedule = [
             "00:00", "00:15", "00:30", "00:45", "00:55", "01:10", "01:25", "01:40", "01:55", "02:15",
-            "02:45", "03:15", "03:45", "04:15", "04:25", "04:55", "04:50", "05:10", "05:25", "05:40",
+            "02:45", "03:15", "03:45", "04:15", "04:25", "04:50", "04:55", "05:10", "05:25", "05:40",
             "05:50", "06:10", "06:25", "06:45", "07:00", "07:20", "07:40", "07:55", "08:15", "08:55",
             "08:55", "09:15", "09:45", "10:15", "10:35", "10:55", "11:10", "11:35", "11:50", "12:10",
             "12:25", "12:50", "13:15", "13:35", "14:00", "14:25", "14:50", "15:15", "15:40", "16:10",
@@ -233,7 +324,7 @@
         }
 
         function getBusTimes() {
-            const currentSchedule = isDso2ToHQ ? dso2ToHQSchedule : hqToDso2Schedule;
+            const currentSchedule = isDSO2ToHQ ? dso2ToHQSchedule.map(item => item.dso2) : hqToDSO2Schedule;
             const now = new Date();
             const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes() + (now.getSeconds() + now.getMilliseconds() / 1000) / 60;
             let previousBus = { time: currentSchedule[currentSchedule.length - 1], minutes: 0 };
@@ -266,71 +357,88 @@
         }
 
         function updateSkyAndCelestial() {
-            // Obtener hora actual en Dubái (UTC+4)
             const now = new Date();
-            const utcOffset = 4 * 60; // Dubái está en UTC+4
+            const utcOffset = 4 * 60; // Offset de Dubai (UTC+4)
             const dubaiTime = new Date(now.getTime() + utcOffset * 60 * 1000);
             const hours = dubaiTime.getHours();
             const minutes = dubaiTime.getMinutes();
             const totalMinutes = hours * 60 + minutes;
 
+            const month = dubaiTime.getMonth(); // 0 = enero, 11 = diciembre
             const celestial = document.getElementById('celestialBody');
+            const starsContainer = document.getElementById('starsContainer');
             let gradient;
 
-            // Horarios aproximados de amanecer y atardecer en Dubái (ajustados a marzo)
-            const sunrise = 6.5 * 60; // 06:30
-            const sunset = 18.5 * 60; // 18:30
-            const dayLength = sunset - sunrise; // Duración del día
-            const nightLength = 1440 - dayLength; // Duración de la noche
+            // Definir horarios de invierno y verano
+            const winterSunrise = 7 * 60; // 7:00 a.m.
+            const winterSunset = 17.5 * 60; // 5:30 p.m.
+            const summerSunrise = 5.5 * 60; // 5:30 a.m.
+            const summerSunset = 19 + 10 / 60; // 7:10 p.m.
 
-            // Determinar si es día o noche y asignar cuerpo celeste
+            // Interpolación lineal basada en el mes
+            let sunrise, sunset;
+            if (month === 11 || month === 0) { // Diciembre o Enero
+                sunrise = winterSunrise;
+                sunset = winterSunset;
+            } else if (month === 5 || month === 6) { // Junio o Julio
+                sunrise = summerSunrise;
+                sunset = summerSunset;
+            } else {
+                // Interpolación entre invierno (mes 0) y verano (mes 6)
+                const monthProgress = month <= 6 ? month / 6 : (12 - month) / 6;
+                sunrise = winterSunrise + (summerSunrise - winterSunrise) * monthProgress;
+                sunset = winterSunset + (summerSunset - winterSunset) * monthProgress;
+            }
+
+            // Determinar si es de día o de noche
             if (totalMinutes >= sunrise && totalMinutes < sunset) {
                 gradient = 'linear-gradient(to bottom, #87cefa, #4682b4)';
-                celestial.textContent = '☀️'; // Sol
+                celestial.textContent = '☀️';
+                starsContainer.style.display = 'none';
             } else {
                 gradient = 'linear-gradient(to bottom, #191970, #000080)';
-                celestial.textContent = '🌙'; // Luna
+                celestial.textContent = '🌙';
+                starsContainer.style.display = 'block';
+                if (!starsCreated) {
+                    createStars();
+                    starsCreated = true;
+                }
             }
             document.body.style.background = gradient;
 
-            // Calcular progreso en el día o la noche
+            // Calcular la posición del cuerpo celeste
             let progress;
+            const dayLength = sunset - sunrise;
+            const nightLength = 1440 - dayLength;
+
             if (totalMinutes >= sunrise && totalMinutes < sunset) {
-                progress = (totalMinutes - sunrise) / dayLength; // Progreso del día
+                progress = (totalMinutes - sunrise) / dayLength;
             } else {
                 const nightMinutes = totalMinutes < sunrise 
                     ? totalMinutes + (1440 - sunset) 
                     : totalMinutes - sunset;
-                progress = nightMinutes / nightLength; // Progreso de la noche
+                progress = nightMinutes / nightLength;
             }
             progress = Math.max(0, Math.min(1, progress));
 
-            // Obtener dimensiones del contenedor para evitarlo
             const container = document.querySelector('.container');
             const containerRect = container.getBoundingClientRect();
-            const containerWidth = containerRect.width / window.innerWidth * 100; // % en vw
-            const containerHeight = containerRect.height / window.innerHeight * 100; // % en vh
+            const containerWidth = containerRect.width / window.innerWidth * 100;
+            const containerHeight = containerRect.height / window.innerHeight * 100;
             const containerLeft = containerRect.left / window.innerWidth * 100;
             const containerTop = containerRect.top / window.innerHeight * 100;
-            const containerRight = containerLeft + containerWidth;
-            const containerBottom = containerTop + containerHeight;
 
-            // Definir trayectoria parabólica
-            const startX = 0; // Esquina inferior izquierda
-            const endX = 100; // Esquina inferior derecha
-            const startY = 100; // Parte inferior de la pantalla
-            const endY = 100; // Parte inferior de la pantalla
-            const maxHeight = containerTop - 20; // Altura máxima ajustada
+            const startX = 0;
+            const endX = 100;
+            const startY = 100;
+            const endY = 100;
+            const maxHeight = containerTop - 20;
 
-            // Calcular posición X (lineal de izquierda a derecha)
             const leftPosition = startX + (endX - startX) * progress;
-
-            // Calcular posición Y (parábola que evita el contenedor)
-            const h = 50; // Punto medio en X
-            const a = (startY - maxHeight) / Math.pow(h - startX, 2); // Coeficiente parabólico
+            const h = 50;
+            const a = (startY - maxHeight) / Math.pow(h - startX, 2);
             const topPosition = a * Math.pow(leftPosition - h, 2) + maxHeight;
 
-            // Aplicar posición al cuerpo celeste
             celestial.style.left = `${leftPosition}vw`;
             celestial.style.top = `${topPosition}vh`;
             celestial.style.display = 'block';
@@ -406,11 +514,11 @@
         }
 
         document.getElementById('toggleRoute').addEventListener('click', function() {
-            isDso2ToHQ = !isDso2ToHQ;
+            isDSO2ToHQ = !isDSO2ToHQ;
             const routeTitle = document.getElementById('routeTitle');
             const toggleButton = document.getElementById('toggleRoute');
             
-            if (isDso2ToHQ) {
+            if (isDSO2ToHQ) {
                 routeTitle.textContent = "DSO 2 to HQ in";
                 toggleButton.textContent = "🔄";
             } else {
@@ -420,16 +528,80 @@
             updateCountdown();
         });
 
+        function findClosestBusTimes(inputTime) {
+            const [inputHours, inputMinutes] = inputTime.split(':').map(Number);
+            const targetTimeInMinutes = inputHours * 60 + inputMinutes;
+            const maxDelayMinutes = 30;
+
+            const schedule = dso2ToHQSchedule.map(item => ({
+                dso2: item.dso2,
+                hq: item.hq,
+                dso2Minutes: item.dso2.split(':').map(Number)[0] * 60 + item.dso2.split(':').map(Number)[1],
+                hqMinutes: item.hq.split(':').map(Number)[0] * 60 + item.hq.split(':').map(Number)[1]
+            }));
+
+            schedule.push({
+                dso2: schedule[0].dso2,
+                hq: schedule[0].hq,
+                dso2Minutes: schedule[0].dso2Minutes + 1440,
+                hqMinutes: schedule[0].hqMinutes + 1440
+            });
+
+            const validTimes = schedule.filter(item => {
+                const diff = item.hqMinutes - targetTimeInMinutes;
+                return diff >= 0 && diff <= maxDelayMinutes;
+            });
+
+            validTimes.sort((a, b) => a.dso2Minutes - b.dso2Minutes);
+
+            return validTimes.slice(0, 3).map(item => ({ dso2: item.dso2, hq: item.hq }));
+        }
+
+        document.getElementById('playButton').addEventListener('click', function() {
+            document.querySelector('.input-container').style.display = 'none';
+            document.getElementById('closestTimes').style.display = 'none';
+            const eGateButton = document.getElementById('eGateButton');
+            eGateButton.style.display = 'inline-block';
+            eGateButton.style.width = '100px';
+            eGateButton.style.height = '24px';
+            eGateButton.style.background = 'white';
+        });
+
+        document.getElementById('busTimeInput').addEventListener('change', function() {
+            const input = document.getElementById('busTimeInput').value.trim();
+            const closestTimesDiv = document.getElementById('closestTimes');
+
+            if (!input) {
+                closestTimesDiv.textContent = '';
+                closestTimesDiv.style.display = 'none';
+                return;
+            }
+
+            const closestTimes = findClosestBusTimes(input);
+            if (closestTimes.length === 0) {
+                closestTimesDiv.textContent = '';
+                closestTimesDiv.style.display = 'none';
+            } else {
+                const result = closestTimes.map(item => `${item.dso2} ➡️ ${item.hq}`).join(', ');
+                closestTimesDiv.textContent = result;
+                closestTimesDiv.style.display = 'block';
+            }
+        });
+
+        document.getElementById('eGateButton').addEventListener('click', function() {
+            document.getElementById('eGateButton').style.display = 'none';
+            document.querySelector('.input-container').style.display = 'flex';
+        });
+
         window.onload = function() {
             generateRandomDune();
             document.body.style.height = window.innerHeight + 'px';
             window.scrollTo(0, 0);
             updateSkyAndCelestial();
-            createStars();
+            updateCountdown();
         };
 
         setInterval(updateCountdown, 100);
-        updateCountdown();
     </script>
 </body>
 </html>
