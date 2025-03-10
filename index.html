@@ -25,23 +25,32 @@
             position: fixed;
             top: 0;
             left: 0;
-            background: #191970;
+        }
+        #background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #191970, #000080);
+            background-size: cover;
+            background-attachment: fixed;
+            z-index: 0;
         }
         body {
             font-family: 'Emirates Bold', Helvetica, Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: background 1s ease;
             position: relative;
-            background-size: cover;
-            background-position: center;
+            z-index: 1;
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
+            box-sizing: border-box;
         }
         .emirates-logo {
             position: fixed;
-            bottom: 20px;
+            bottom: calc(20px + env(safe-area-inset-bottom));
             left: 50%;
             transform: translateX(-50%);
             z-index: 3;
@@ -223,6 +232,7 @@
     </style>
 </head>
 <body>
+    <div id="background-container"></div>
     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Emirates_logo.svg/1200px-Emirates_logo.svg.png" 
          alt="Emirates Logo" class="emirates-logo">
     <div class="container">
@@ -401,7 +411,7 @@
                     starsCreated = true;
                 }
             }
-            document.body.style.background = gradient;
+            document.getElementById('background-container').style.background = gradient;
 
             // Calcular la posición del cuerpo celeste (sol o luna)
             let progress;
