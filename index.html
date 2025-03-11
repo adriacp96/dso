@@ -30,9 +30,9 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            min-height: 100vh;
-            background: linear-gradient(to bottom, #191970, #000080);
+            width: 100vw; /* Aseguramos que ocupe todo el ancho */
+            height: 100vh; /* Aseguramos que ocupe todo el alto */
+            background: linear-gradient(to right, #191970, #000080); /* Gradiente de izquierda a derecha */
             background-size: cover;
             background-attachment: fixed;
             z-index: 0;
@@ -415,11 +415,11 @@
 
             // Determinar si es de día o de noche y actualizar el cuerpo celeste
             if (totalMinutes >= sunrise && totalMinutes < sunset) {
-                gradient = 'linear-gradient(to bottom, #87cefa, #4682b4)';
+                gradient = 'linear-gradient(to right, #87cefa, #4682b4)'; // Gradiente diurno de izquierda a derecha
                 celestial.textContent = '☀️';
                 starsContainer.style.display = 'none';
             } else {
-                gradient = 'linear-gradient(to bottom, #191970, #000080)';
+                gradient = 'linear-gradient(to right, #191970, #000080)'; // Gradiente nocturno de izquierda a derecha
                 celestial.textContent = '🌙';
                 starsContainer.style.display = 'block';
                 if (!starsCreated) {
