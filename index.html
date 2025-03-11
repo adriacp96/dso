@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>DSO 2</title>
+    <title>Grosvenor</title>
     <link rel="apple-touch-icon" href="https://i.imghippo.com/files/DTwy2581QE.png">
     <link rel="apple-touch-startup-image" href="https://example.com/splash.png">
     <style>
@@ -16,40 +16,43 @@
             font-style: normal;
         }
 
-        html, body {
-            height: 100vh;
-            width: 100vw;
+        html {
+            height: 100%;
+            width: 100%;
             margin: 0;
             padding: 0;
             overflow: hidden;
-            position: fixed;
-            top: 0;
-            left: 0;
         }
         #background-container {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw; /* Aseguramos que ocupe todo el ancho */
-            height: 100vh; /* Aseguramos que ocupe todo el alto */
-            background: linear-gradient(to right, #191970, #000080); /* Gradiente de izquierda a derecha */
+            width: 100%;
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #191970, #000080);
             background-size: cover;
             background-attachment: fixed;
             z-index: 0;
         }
         body {
             font-family: 'Emirates Bold', Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100%;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             position: relative;
             z-index: 1;
+            overflow: hidden;
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
             box-sizing: border-box;
         }
         .emirates-logo {
-            position: fixed;
+            position: absolute;
             bottom: calc(20px + env(safe-area-inset-bottom));
             left: 50%;
             transform: translateX(-50%);
@@ -264,59 +267,43 @@
 
     <script>
         let dunePoints = [];
-        let isDSO2ToHQ = true;
+        let isGrosvenorToHQ = true;
         let starsCreated = false;
 
-        const dso2ToHQSchedule = [
-            { dso2: "00:29", hq: "01:05" }, { dso2: "00:44", hq: "01:40" }, { dso2: "00:59", hq: "01:35" },
-            { dso2: "01:14", hq: "01:50" }, { dso2: "01:24", hq: "02:00" }, { dso2: "01:39", hq: "02:15" },
-            { dso2: "01:54", hq: "02:30" }, { dso2: "02:09", hq: "02:45" }, { dso2: "02:24", hq: "03:00" },
-            { dso2: "02:44", hq: "03:20" }, { dso2: "03:14", hq: "03:50" }, { dso2: "03:44", hq: "04:20" },
-            { dso2: "04:14", hq: "04:50" }, { dso2: "04:44", hq: "05:20" }, { dso2: "04:54", hq: "05:30" },
-            { dso2: "05:04", hq: "05:40" }, { dso2: "05:19", hq: "05:55" }, { dso2: "05:39", hq: "06:15" },
-            { dso2: "05:54", hq: "06:34" }, { dso2: "06:09", hq: "06:49" }, { dso2: "06:19", hq: "06:59" },
-            { dso2: "06:39", hq: "07:19" }, { dso2: "06:54", hq: "07:34" }, { dso2: "07:14", hq: "07:54" },
-            { dso2: "07:29", hq: "08:09" }, { dso2: "07:49", hq: "08:29" }, { dso2: "08:09", hq: "08:49" },
-            { dso2: "08:24", hq: "09:04" }, { dso2: "08:44", hq: "09:24" }, { dso2: "09:04", hq: "09:44" },
-            { dso2: "09:24", hq: "10:04" }, { dso2: "09:44", hq: "10:24" }, { dso2: "10:14", hq: "10:54" },
-            { dso2: "10:44", hq: "11:24" }, { dso2: "11:04", hq: "11:44" }, { dso2: "11:24", hq: "12:04" },
-            { dso2: "11:39", hq: "12:19" }, { dso2: "12:04", hq: "12:44" }, { dso2: "12:19", hq: "12:59" },
-            { dso2: "12:39", hq: "13:19" }, { dso2: "12:54", hq: "13:34" }, { dso2: "13:19", hq: "13:59" },
-            { dso2: "13:44", hq: "14:24" }, { dso2: "14:04", hq: "14:44" }, { dso2: "14:29", hq: "15:09" },
-            { dso2: "14:54", hq: "15:34" }, { dso2: "15:19", hq: "15:59" }, { dso2: "15:44", hq: "16:24" },
-            { dso2: "16:09", hq: "16:52" }, { dso2: "16:39", hq: "17:22" }, { dso2: "17:39", hq: "17:52" },
-            { dso2: "17:39", hq: "18:22" }, { dso2: "18:04", hq: "18:47" }, { dso2: "18:34", hq: "19:17" },
-            { dso2: "19:04", hq: "19:47" }, { dso2: "19:34", hq: "20:17" }, { dso2: "20:04", hq: "20:47" },
-            { dso2: "20:29", hq: "21:09" }, { dso2: "20:54", hq: "21:34" }, { dso2: "21:19", hq: "21:59" },
-            { dso2: "21:39", hq: "22:19" }, { dso2: "22:04", hq: "22:44" }, { dso2: "22:29", hq: "23:09" },
-            { dso2: "22:49", hq: "23:29" }, { dso2: "23:04", hq: "23:44" }, { dso2: "23:29", hq: "00:09" },
-            { dso2: "23:44", hq: "00:24" }, { dso2: "23:59", hq: "00:39" }, { dso2: "00:14", hq: "00:50" }
+        const grosvenorToHQSchedule = [
+            { gros: "00:29", hq: "1:05" }, { gros: "00:44", hq: "1:40" }, { gros: "00:59", hq: "1:35" },
+            { gros: "1:14", hq: "1:50" }, { gros: "1:24", hq: "2:00" }, { gros: "1:39", hq: "2:15" },
+            { gros: "1:54", hq: "2:30" }, { gros: "2:09", hq: "2:45" }, { gros: "2:24", hq: "3:00" },
+            { gros: "2:44", hq: "3:20" }, { gros: "3:14", hq: "3:50" }, { gros: "3:44", hq: "4:20" },
+            { gros: "4:14", hq: "4:50" }, { gros: "4:44", hq: "5:20" }, { gros: "4:54", hq: "5:30" },
+            { gros: "5:04", hq: "5:40" }, { gros: "5:19", hq: "5:55" }, { gros: "5:39", hq: "6:15" },
+            { gros: "5:54", hq: "6:34" }, { gros: "6:09", hq: "6:49" }, { gros: "6:19", hq: "6:59" },
+            { gros: "6:39", hq: "7:19" }, { gros: "6:54", hq: "7:34" }, { gros: "7:14", hq: "7:54" },
+            { gros: "7:29", hq: "8:09" }, { gros: "7:49", hq: "8:29" }, { gros: "8:09", hq: "8:49" },
+            { gros: "8:24", hq: "9:04" }, { gros: "8:44", hq: "9:24" }, { gros: "9:04", hq: "9:44" },
+            { gros: "9:24", hq: "10:04" }, { gros: "10:14", hq: "10:54" }, { gros: "10:44", hq: "11:24" },
+            { gros: "11:04", hq: "11:44" }, { gros: "11:24", hq: "12:04" }, { gros: "11:39", hq: "12:19" },
+            { gros: "12:04", hq: "12:44" }, { gros: "12:19", hq: "12:59" }, { gros: "12:39", hq: "13:19" },
+            { gros: "12:54", hq: "13:34" }, { gros: "13:19", hq: "13:59" }, { gros: "13:44", hq: "14:24" },
+            { gros: "14:04", hq: "14:44" }, { gros: "14:29", hq: "15:09" }, { gros: "14:54", hq: "15:34" },
+            { gros: "15:19", hq: "15:59" }, { gros: "15:44", hq: "16:24" }, { gros: "16:09", hq: "16:52" },
+            { gros: "16:39", hq: "17:22" }, { gros: "17:39", hq: "17:52" }, { gros: "17:39", hq: "18:22" },
+            { gros: "18:04", hq: "18:47" }, { gros: "18:34", hq: "19:17" }, { gros: "19:04", hq: "19:47" },
+            { gros: "19:34", hq: "20:17" }, { gros: "20:04", hq: "20:47" }, { gros: "20:29", hq: "21:09" },
+            { gros: "20:54", hq: "21:34" }, { gros: "21:19", hq: "21:59" }, { gros: "21:39", hq: "22:19" },
+            { gros: "22:04", hq: "22:44" }, { gros: "22:29", hq: "23:09" }, { gros: "22:49", hq: "23:29" },
+            { gros: "23:04", hq: "23:44" }, { gros: "23:29", hq: "0:09" }, { gros: "23:44", hq: "0:24" },
+            { gros: "23:59", hq: "0:39" }, { gros: "0:14", hq: "0:50" }
         ];
 
-        const hqToDSO2Schedule = [
-            { hq: "00:00", dso2: "00:29" }, { hq: "00:15", dso2: "00:44" }, { hq: "00:30", dso2: "00:59" },
-            { hq: "00:45", dso2: "01:14" }, { hq: "00:55", dso2: "01:24" }, { hq: "01:10", dso2: "01:39" },
-            { hq: "01:25", dso2: "01:54" }, { hq: "01:40", dso2: "02:09" }, { hq: "01:55", dso2: "02:24" },
-            { hq: "02:15", dso2: "02:44" }, { hq: "02:45", dso2: "03:14" }, { hq: "03:15", dso2: "03:44" },
-            { hq: "03:45", dso2: "04:14" }, { hq: "04:15", dso2: "04:44" }, { hq: "04:25", dso2: "04:54" },
-            { hq: "04:50", dso2: "05:04" }, { hq: "04:55", dso2: "05:19" }, { hq: "05:10", dso2: "05:39" },
-            { hq: "05:25", dso2: "05:54" }, { hq: "05:40", dso2: "06:09" }, { hq: "05:50", dso2: "06:19" },
-            { hq: "06:10", dso2: "06:39" }, { hq: "06:25", dso2: "06:54" }, { hq: "06:45", dso2: "07:14" },
-            { hq: "07:00", dso2: "07:29" }, { hq: "07:20", dso2: "07:49" }, { hq: "07:40", dso2: "08:09" },
-            { hq: "07:55", dso2: "08:24" }, { hq: "08:15", dso2: "08:44" }, { hq: "08:55", dso2: "09:04" },
-            { hq: "08:55", dso2: "09:24" }, { hq: "09:15", dso2: "09:44" }, { hq: "09:45", dso2: "10:14" },
-            { hq: "10:15", dso2: "10:44" }, { hq: "10:35", dso2: "11:04" }, { hq: "10:55", dso2: "11:24" },
-            { hq: "11:10", dso2: "11:39" }, { hq: "11:35", dso2: "12:04" }, { hq: "11:50", dso2: "12:19" },
-            { hq: "12:10", dso2: "12:39" }, { hq: "12:25", dso2: "12:54" }, { hq: "12:50", dso2: "13:19" },
-            { hq: "13:15", dso2: "13:44" }, { hq: "13:35", dso2: "14:04" }, { hq: "14:00", dso2: "14:29" },
-            { hq: "14:25", dso2: "14:54" }, { hq: "14:50", dso2: "15:19" }, { hq: "15:15", dso2: "15:44" },
-            { hq: "15:40", dso2: "16:09" }, { hq: "16:10", dso2: "16:39" }, { hq: "16:40", dso2: "17:39" },
-            { hq: "17:10", dso2: "17:39" }, { hq: "17:35", dso2: "18:04" }, { hq: "18:05", dso2: "18:34" },
-            { hq: "18:35", dso2: "19:04" }, { hq: "19:05", dso2: "19:34" }, { hq: "19:35", dso2: "20:04" },
-            { hq: "20:00", dso2: "20:29" }, { hq: "20:25", dso2: "20:54" }, { hq: "20:50", dso2: "21:19" },
-            { hq: "21:10", dso2: "21:39" }, { hq: "21:35", dso2: "22:04" }, { hq: "22:00", dso2: "22:29" },
-            { hq: "22:20", dso2: "22:49" }, { hq: "22:35", dso2: "23:04" }, { hq: "23:00", dso2: "23:29" },
-            { hq: "23:15", dso2: "23:44" }, { hq: "23:30", dso2: "23:59" }, { hq: "23:45", dso2: "00:14" }
+        const hqToGrosvenorSchedule = [
+            "0:00", "0:25", "0:55", "1:10", "1:35", "1:50", "2:05", "2:20", "2:40", "3:10", 
+            "3:40", "4:10", "4:40", "5:00", "5:15", "5:35", "5:50", "6:05", "6:35", "6:50", 
+            "7:10", "7:25", "7:45", "8:05", "8:20", "9:00", "9:20", "9:40", "10:10", "10:40", 
+            "11:00", "11:20", "11:35", "12:00", "12:15", "12:35", "13:00", "13:40", "14:00", 
+            "14:25", "14:50", "15:15", "15:40", "16:05", "16:35", "17:05", "17:35", "18:00", 
+            "18:30", "19:00", "19:30", "20:00", "20:25", "20:50", "21:15", "21:35", "22:00", 
+            "22:25", "22:45", "23:00", "23:25", "23:40", "23:55"
         ];
 
         function generateRandomDune() {
@@ -363,7 +350,7 @@
         }
 
         function getBusTimes() {
-            const currentSchedule = isDSO2ToHQ ? dso2ToHQSchedule.map(item => item.dso2) : hqToDSO2Schedule.map(item => item.hq);
+            const currentSchedule = isGrosvenorToHQ ? grosvenorToHQSchedule.map(item => item.gros) : hqToGrosvenorSchedule;
             const now = new Date();
             const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes() + (now.getSeconds() + now.getMilliseconds() / 1000) / 60;
             let previousBus = { time: currentSchedule[currentSchedule.length - 1], minutes: 0 };
@@ -397,7 +384,7 @@
 
         function updateSkyAndCelestial() {
             const now = new Date();
-            const utcOffset = 4 * 60; // Offset de Dubai (UTC+4)
+            const utcOffset = 4 * 60;
             const dubaiTime = new Date(now.getTime() + utcOffset * 60 * 1000);
             const hours = dubaiTime.getHours();
             const minutes = dubaiTime.getMinutes();
@@ -407,19 +394,17 @@
             const starsContainer = document.getElementById('starsContainer');
             let gradient;
 
-            // Horarios aproximados para Dubái el 10 de marzo de 2025
-            const sunrise = 6 * 60 + 30; // 6:30 a.m.
-            const sunset = 18 * 60 + 30; // 6:30 p.m.
-            const moonrise = 12 * 60 + 45; // 12:45 p.m. (aproximado)
-            const moonset = 1 * 60 + 15; // 1:15 a.m. del día siguiente (aproximado)
+            const sunrise = 6 * 60 + 30;
+            const sunset = 18 * 60 + 30;
+            const moonrise = 12 * 60 + 45;
+            const moonset = 1 * 60 + 15;
 
-            // Determinar si es de día o de noche y actualizar el cuerpo celeste
             if (totalMinutes >= sunrise && totalMinutes < sunset) {
-                gradient = 'linear-gradient(to right, #87cefa, #4682b4)'; // Gradiente diurno de izquierda a derecha
+                gradient = 'linear-gradient(to bottom, #87cefa, #4682b4)';
                 celestial.textContent = '☀️';
                 starsContainer.style.display = 'none';
             } else {
-                gradient = 'linear-gradient(to right, #191970, #000080)'; // Gradiente nocturno de izquierda a derecha
+                gradient = 'linear-gradient(to bottom, #191970, #000080)';
                 celestial.textContent = '🌙';
                 starsContainer.style.display = 'block';
                 if (!starsCreated) {
@@ -429,7 +414,6 @@
             }
             document.getElementById('background-container').style.background = gradient;
 
-            // Calcular la posición del cuerpo celeste (sol o luna)
             let progress;
             const isDay = totalMinutes >= sunrise && totalMinutes < sunset;
             const dayLength = sunset - sunrise;
@@ -539,11 +523,11 @@
         }
 
         document.getElementById('toggleRoute').addEventListener('click', function() {
-            isDSO2ToHQ = !isDSO2ToHQ;
+            isGrosvenorToHQ = !isGrosvenorToHQ;
             const routeTitle = document.getElementById('routeTitle');
             const toggleButton = document.getElementById('toggleRoute');
             
-            if (isDSO2ToHQ) {
+            if (isGrosvenorToHQ) {
                 routeTitle.textContent = "DSO 2 to HQ in";
                 toggleButton.textContent = "🔄";
             } else {
@@ -558,17 +542,17 @@
             const targetTimeInMinutes = inputHours * 60 + inputMinutes;
             const maxDelayMinutes = 30;
 
-            const schedule = dso2ToHQSchedule.map(item => ({
-                dso2: item.dso2,
+            const schedule = grosvenorToHQSchedule.map(item => ({
+                gros: item.gros,
                 hq: item.hq,
-                dso2Minutes: item.dso2.split(':').map(Number)[0] * 60 + item.dso2.split(':').map(Number)[1],
+                grosMinutes: item.gros.split(':').map(Number)[0] * 60 + item.gros.split(':').map(Number)[1],
                 hqMinutes: item.hq.split(':').map(Number)[0] * 60 + item.hq.split(':').map(Number)[1]
             }));
 
             schedule.push({
-                dso2: schedule[0].dso2,
+                gros: schedule[0].gros,
                 hq: schedule[0].hq,
-                dso2Minutes: schedule[0].dso2Minutes + 1440,
+                grosMinutes: schedule[0].grosMinutes + 1440,
                 hqMinutes: schedule[0].hqMinutes + 1440
             });
 
@@ -577,9 +561,9 @@
                 return diff >= 0 && diff <= maxDelayMinutes;
             });
 
-            validTimes.sort((a, b) => a.dso2Minutes - b.dso2Minutes);
+            validTimes.sort((a, b) => a.grosMinutes - b.grosMinutes);
 
-            return validTimes.slice(0, 3).map(item => ({ dso2: item.dso2, hq: item.hq }));
+            return validTimes.slice(0, 3).map(item => ({ gros: item.gros, hq: item.hq }));
         }
 
         document.getElementById('playButton').addEventListener('click', function() {
@@ -607,7 +591,7 @@
                 closestTimesDiv.textContent = '';
                 closestTimesDiv.style.display = 'none';
             } else {
-                const result = closestTimes.map(item => `${item.dso2} ➡️ ${item.hq}`).join(', ');
+                const result = closestTimes.map(item => `${item.gros} ➡️ ${item.hq}`).join(', ');
                 closestTimesDiv.textContent = result;
                 closestTimesDiv.style.display = 'block';
             }
@@ -620,7 +604,6 @@
 
         window.onload = function() {
             generateRandomDune();
-            document.body.style.height = window.innerHeight + 'px';
             window.scrollTo(0, 0);
             updateSkyAndCelestial();
             updateCountdown();
@@ -630,3 +613,4 @@
     </script>
 </body>
 </html>
+```​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
