@@ -114,8 +114,8 @@
         #celestialBody {
             font-size: 60px;
             position: absolute;
-            transition: all 1s ease;
             z-index: 1;
+            transition: all 1s ease;
             opacity: 1;
             pointer-events: none;
         }
@@ -384,7 +384,7 @@
 
         function updateSkyAndCelestial() {
             const now = new Date();
-            const utcOffset = 4 * 60;
+            const utcOffset = 4 * 60; // Offset para Dubai (UTC+4)
             const dubaiTime = new Date(now.getTime() + utcOffset * 60 * 1000);
             const hours = dubaiTime.getHours();
             const minutes = dubaiTime.getMinutes();
@@ -394,11 +394,12 @@
             const starsContainer = document.getElementById('starsContainer');
             let gradient;
 
-            const sunrise = 6 * 60 + 30;
-            const sunset = 18 * 60 + 30;
-            const moonrise = 18 * 60 + 30;
-            const moonset = 6 * 60 + 30;
+            const sunrise = 6 * 60 + 30;  // 6:30
+            const sunset = 18 * 60 + 30;  // 18:30
+            const moonrise = 18 * 60 + 30; // 18:30
+            const moonset = 6 * 60 + 30;  // 6:30 siguiente día
 
+            // Determinar si es día o noche
             if (totalMinutes >= sunrise && totalMinutes < sunset) {
                 gradient = 'linear-gradient(to bottom, #87cefa, #4682b4)';
                 celestial.textContent = '☀️';
@@ -414,14 +415,9 @@
             }
             document.getElementById('background-container').style.background = gradient;
 
-            let progress;
+            // Calcular progreso en el semicírculo
             const periodLength = 12 * 60; // 12 horas en minutos
-            const startX = -10; // Izquierda inferior
-            const endX = 110;   // Derecha inferior
-            const radiusX = (endX - startX) / 2;
-            const centerX = startX + radiusX;
-            const duneHeight = 25; // Altura de las dunas en vh
-            const maxHeight = window.innerHeight * (100 - duneHeight) / 100; // Punto más alto del semicírculo
+            let progress;
 
             if (totalMinutes >= sunrise && totalMinutes < sunset) {
                 // Día: Sol
@@ -433,13 +429,21 @@
             }
             progress = Math.max(0, Math.min(1, progress));
 
-            // Calcular posición en el semicírculo
-            const angle = progress * Math.PI; // 0 a π (180 grados)
-            const leftPosition = centerX + radiusX * Math.sin(angle);
-            const topPosition = maxHeight - (maxHeight * Math.cos(angle)) / 2;
+            // Definir el semicírculo
+            const startX = 0;   // Izquierda inferior
+            const endX = 100;   // Derecha inferior
+            const radiusX = (endX - startX) / 2;
+            const centerX = startX + radiusX;
+            const baseY = 75;   // Altura base (justo encima de las dunas)
+            const maxHeight = 25; // Punto más alto del semicírculo
 
-            celestial.style.left = `${leftPosition}vw`;
-            celestial.style.top = `${topPosition}px`; // Usar px para mayor precisión
+            const angle = progress * Math.PI; // 0 a π (180 grados)
+            const leftPosition = centerX + radiusX * Math.sin(angle); // Movimiento horizontal
+            const topPosition = baseY - (baseY - maxHeight) * Math.cos(angle); // Movimiento vertical
+
+            // Aplicar posición
+            celestial.style.left = `${leftPosition}%`;
+            celestial.style.top = `${topPosition}%`;
             celestial.style.display = 'block';
         }
 
@@ -500,8 +504,8 @@
                 const y = Math.random() * 75;
                 const size = Math.random() * 3 + 1;
 
-                star.style.left = `${x}vw`;
-                star.style.top = `${y}vh`;
+                star.style.left = `${x}%`;
+                star.style.top = `${y}%`;
                 star.style.width = `${size}px`;
                 star.style.height = `${size}px`;
 
