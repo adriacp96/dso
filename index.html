@@ -429,21 +429,21 @@
             }
             progress = Math.max(0, Math.min(1, progress));
 
-            // Definir el semicírculo
-            const startX = 0;   // Izquierda inferior
-            const endX = 100;   // Derecha inferior
-            const radiusX = (endX - startX) / 2;
+            // Definir el semicírculo dentro de los límites visibles
+            const startX = 10;    // 10% desde la izquierda
+            const endX = 90;      // 90% desde la izquierda (dentro de la pantalla)
+            const radiusX = (endX - startX) / 2; // Radio horizontal
             const centerX = startX + radiusX;
-            const baseY = 75;   // Altura base (justo encima de las dunas)
-            const maxHeight = 25; // Punto más alto del semicírculo
+            const startY = 70;    // 70% desde la parte superior (justo encima de las dunas)
+            const maxHeight = 20; // 20% desde la parte superior (punto más alto)
 
             const angle = progress * Math.PI; // 0 a π (180 grados)
             const leftPosition = centerX + radiusX * Math.sin(angle); // Movimiento horizontal
-            const topPosition = baseY - (baseY - maxHeight) * Math.cos(angle); // Movimiento vertical
+            const topPosition = startY - (startY - maxHeight) * Math.cos(angle); // Movimiento vertical
 
-            // Aplicar posición
-            celestial.style.left = `${leftPosition}%`;
-            celestial.style.top = `${topPosition}%`;
+            // Aplicar posición asegurando que esté dentro de la pantalla
+            celestial.style.left = `${Math.max(0, Math.min(100, leftPosition))}%`;
+            celestial.style.top = `${Math.max(0, Math.min(100, topPosition))}%`;
             celestial.style.display = 'block';
         }
 
@@ -534,7 +534,7 @@
         function findClosestBusTimes(inputTime) {
             const [inputHours, inputMinutes] = inputTime.split(':').map(Number);
             const targetTimeInMinutes = inputHours * 60 + inputMinutes;
-            const maxDelayMinutes = 55; // Cambiado de 40 a 55 minutos
+            const maxDelayMinutes = 55; // 55 minutos como solicitado
 
             const schedule = grosvenorToHQSchedule.map(item => ({
                 gros: item.gros,
