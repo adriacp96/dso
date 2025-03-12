@@ -415,31 +415,31 @@
             document.getElementById('background-container').style.background = gradient;
 
             let progress;
-            const isDay = totalMinutes >= sunrise && totalMinutes < sunset;
-            const periodLength = 12 * 60;
+            const periodLength = 12 * 60; // 12 horas en minutos
+            const startX = -10; // Izquierda inferior
+            const endX = 110;   // Derecha inferior
+            const radiusX = (endX - startX) / 2;
+            const centerX = startX + radiusX;
+            const duneHeight = 25; // Altura de las dunas en vh
+            const maxHeight = window.innerHeight * (100 - duneHeight) / 100; // Punto más alto del semicírculo
 
-            if (isDay) {
+            if (totalMinutes >= sunrise && totalMinutes < sunset) {
+                // Día: Sol
                 progress = (totalMinutes - sunrise) / periodLength;
             } else {
-                const adjustedMinutes = totalMinutes < sunrise 
-                    ? totalMinutes + 1440 - moonset 
-                    : totalMinutes - moonrise;
-                progress = adjustedMinutes / periodLength;
+                // Noche: Luna
+                const nightMinutes = totalMinutes < sunrise ? totalMinutes + 1440 : totalMinutes;
+                progress = (nightMinutes - moonrise) / periodLength;
             }
             progress = Math.max(0, Math.min(1, progress));
 
-            const startX = -10;
-            const endX = 110;
-            const radiusX = (endX - startX) / 2;
-            const centerX = startX + radiusX;
-            const maxHeight = 20;
-
-            const leftPosition = startX + (endX - startX) * progress;
-            const angle = progress * Math.PI;
-            const topPosition = maxHeight + (1 - Math.cos(angle)) * (window.innerHeight * 0.4) / 2;
+            // Calcular posición en el semicírculo
+            const angle = progress * Math.PI; // 0 a π (180 grados)
+            const leftPosition = centerX + radiusX * Math.sin(angle);
+            const topPosition = maxHeight - (maxHeight * Math.cos(angle)) / 2;
 
             celestial.style.left = `${leftPosition}vw`;
-            celestial.style.top = `${topPosition}vh`;
+            celestial.style.top = `${topPosition}px`; // Usar px para mayor precisión
             celestial.style.display = 'block';
         }
 
