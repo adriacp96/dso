@@ -416,36 +416,27 @@
 
             let progress;
             const isDay = totalMinutes >= sunrise && totalMinutes < sunset;
-            const dayLength = sunset - sunrise;
-            const nightLength = 1440 - dayLength;
+            const periodLength = 12 * 60;
 
             if (isDay) {
-                progress = (totalMinutes - sunrise) / dayLength;
+                progress = (totalMinutes - sunrise) / periodLength;
             } else {
                 const adjustedMinutes = totalMinutes < sunrise 
-                    ? totalMinutes + 1440 
+                    ? totalMinutes + 1440 - moonset 
                     : totalMinutes - moonrise;
-                progress = adjustedMinutes / nightLength;
+                progress = adjustedMinutes / periodLength;
             }
             progress = Math.max(0, Math.min(1, progress));
 
-            const container = document.querySelector('.container');
-            const containerRect = container.getBoundingClientRect();
-            const containerWidth = containerRect.width / window.innerWidth * 100;
-            const containerHeight = containerRect.height / window.innerHeight * 100;
-            const containerLeft = containerRect.left / window.innerWidth * 100;
-            const containerTop = containerRect.top / window.innerHeight * 100;
-
-            const startX = 0;
-            const endX = 100;
-            const startY = 100;
-            const endY = 100;
-            const maxHeight = containerTop - 20;
+            const startX = -10;
+            const endX = 110;
+            const radiusX = (endX - startX) / 2;
+            const centerX = startX + radiusX;
+            const maxHeight = 20;
 
             const leftPosition = startX + (endX - startX) * progress;
-            const h = 50;
-            const a = (startY - maxHeight) / Math.pow(h - startX, 2);
-            const topPosition = a * Math.pow(leftPosition - h, 2) + maxHeight;
+            const angle = progress * Math.PI;
+            const topPosition = maxHeight + (1 - Math.cos(angle)) * (window.innerHeight * 0.4) / 2;
 
             celestial.style.left = `${leftPosition}vw`;
             celestial.style.top = `${topPosition}vh`;
