@@ -9,7 +9,6 @@
     <link rel="apple-touch-icon" href="https://i.imghippo.com/files/DTwy2581QE.png">
     <link rel="apple-touch-startup-image" href="https://example.com/splash.png">
     <style>
-        /* [Estilos originales del primer código se mantienen sin cambios] */
         @font-face {
             font-family: 'Emirates Bold';
             src: url('https://c.ekstatic.net/shared/fonts/emirates/emirates-bold-v3.woff2') format('woff2');
@@ -362,7 +361,7 @@
         let starsCreated = false;
 
         const grosvenorToHQSchedule = [
-            { gros: "00:29", hq: "1:05" }, { gros: "00:44", hq: "1:40" }, { gros: "00:59", hq: "1:35" },
+            { gros: "0:29", hq: "1:05" }, { gros: "0:44", hq: "1:40" }, { gros: "0:59", hq: "1:35" },
             { gros: "1:14", hq: "1:50" }, { gros: "1:24", hq: "2:00" }, { gros: "1:39", hq: "2:15" },
             { gros: "1:54", hq: "2:30" }, { gros: "2:09", hq: "2:45" }, { gros: "2:24", hq: "3:00" },
             { gros: "2:44", hq: "3:20" }, { gros: "3:14", hq: "3:50" }, { gros: "3:44", hq: "4:20" },
@@ -388,13 +387,29 @@
         ];
 
         const hqToGrosvenorSchedule = [
-            "0:00", "0:25", "0:55", "1:10", "1:35", "1:50", "2:05", "2:20", "2:40", "3:10", 
-            "3:40", "4:10", "4:40", "5:00", "5:15", "5:35", "5:50", "6:05", "6:35", "6:50", 
-            "7:10", "7:25", "7:45", "8:05", "8:20", "9:00", "9:20", "9:40", "10:10", "10:40", 
-            "11:00", "11:20", "11:35", "12:00", "12:15", "12:35", "13:00", "13:40", "14:00", 
-            "14:25", "14:50", "15:15", "15:40", "16:05", "16:35", "17:05", "17:35", "18:00", 
-            "18:30", "19:00", "19:30", "20:00", "20:25", "20:50", "21:15", "21:35", "22:00", 
-            "22:25", "22:45", "23:00", "23:25", "23:40", "23:55"
+            { hq: "0:00", gros: "0:29" }, { hq: "0:15", gros: "0:44" }, { hq: "0:30", gros: "0:59" },
+            { hq: "0:45", gros: "1:14" }, { hq: "0:55", gros: "1:24" }, { hq: "1:10", gros: "1:39" },
+            { hq: "1:25", gros: "1:54" }, { hq: "1:40", gros: "2:09" }, { hq: "1:55", gros: "2:24" },
+            { hq: "2:15", gros: "2:44" }, { hq: "2:45", gros: "3:14" }, { hq: "3:15", gros: "3:44" },
+            { hq: "3:45", gros: "4:14" }, { hq: "4:15", gros: "4:44" }, { hq: "4:25", gros: "4:54" },
+            { hq: "4:50", gros: "5:04" }, { hq: "4:55", gros: "5:19" }, { hq: "5:10", gros: "5:39" },
+            { hq: "5:25", gros: "5:54" }, { hq: "5:40", gros: "6:09" }, { hq: "5:50", gros: "6:19" },
+            { hq: "6:10", gros: "6:39" }, { hq: "6:25", gros: "6:54" }, { hq: "6:45", gros: "7:14" },
+            { hq: "7:00", gros: "7:29" }, { hq: "7:20", gros: "7:49" }, { hq: "7:40", gros: "8:09" },
+            { hq: "7:55", gros: "8:24" }, { hq: "8:15", gros: "8:44" }, { hq: "8:55", gros: "9:04" },
+            { hq: "8:55", gros: "9:24" }, { hq: "9:15", gros: "9:44" }, { hq: "9:45", gros: "10:14" },
+            { hq: "10:15", gros: "10:44" }, { hq: "10:35", gros: "11:04" }, { hq: "10:55", gros: "11:24" },
+            { hq: "11:10", gros: "11:39" }, { hq: "11:35", gros: "12:04" }, { hq: "11:50", gros: "12:19" },
+            { hq: "12:10", gros: "12:39" }, { hq: "12:25", gros: "12:54" }, { hq: "12:50", gros: "13:19" },
+            { hq: "13:15", gros: "13:44" }, { hq: "13:35", gros: "14:04" }, { hq: "14:00", gros: "14:29" },
+            { hq: "14:25", gros: "14:54" }, { hq: "14:50", gros: "15:19" }, { hq: "15:15", gros: "15:44" },
+            { hq: "15:40", gros: "16:09" }, { hq: "16:10", gros: "16:39" }, { hq: "16:40", gros: "17:39" },
+            { hq: "17:10", gros: "17:39" }, { hq: "17:35", gros: "18:04" }, { hq: "18:05", gros: "18:34" },
+            { hq: "18:35", gros: "19:04" }, { hq: "19:05", gros: "19:34" }, { hq: "19:35", gros: "20:04" },
+            { hq: "20:00", gros: "20:29" }, { hq: "20:25", gros: "20:54" }, { hq: "20:50", gros: "21:19" },
+            { hq: "21:10", gros: "21:39" }, { hq: "21:35", gros: "22:04" }, { hq: "22:00", gros: "22:29" },
+            { hq: "22:20", gros: "22:49" }, { hq: "22:35", gros: "23:04" }, { hq: "23:00", gros: "23:29" },
+            { hq: "23:15", gros: "23:44" }, { hq: "23:30", gros: "23:59" }, { hq: "23:45", gros: "0:14" }
         ];
 
         function generateRandomDune() {
@@ -441,7 +456,7 @@
         }
 
         function getBusTimes() {
-            const currentSchedule = isGrosvenorToHQ ? grosvenorToHQSchedule.map(item => item.gros) : hqToGrosvenorSchedule;
+            const currentSchedule = isGrosvenorToHQ ? grosvenorToHQSchedule.map(item => item.gros) : hqToGrosvenorSchedule.map(item => item.hq);
             const now = new Date();
             const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes() + (now.getSeconds() + now.getMilliseconds() / 1000) / 60;
             let previousBus = { time: currentSchedule[currentSchedule.length - 1], minutes: 0 };
