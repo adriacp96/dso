@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>DSO</title>
+    <title>Grosvenor</title>
     <link rel="apple-touch-icon" href="https://i.imghippo.com/files/DTwy2581QE.png">
     <link rel="apple-touch-startup-image" href="https://example.com/splash.png">
     <style>
+        /* [Estilos originales del primer código se mantienen sin cambios] */
         @font-face {
             font-family: 'Emirates Bold';
             src: url('https://c.ekstatic.net/shared/fonts/emirates/emirates-bold-v3.woff2') format('woff2');
@@ -114,8 +115,8 @@
         #celestialBody {
             font-size: 60px;
             position: absolute;
+            transition: none;
             z-index: 1;
-            transition: all 1s ease;
             opacity: 1;
             pointer-events: none;
         }
@@ -232,6 +233,76 @@
         #eGateButton:hover {
             transform: scale(1.05);
         }
+        /* Popup Styles */
+        #firstVisitPopup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            z-index: 1000;
+            text-align: center;
+            max-width: 90%;
+            width: 300px;
+            color: #2c3e50;
+        }
+        #firstVisitPopup h2 {
+            margin: 0 0 15px 0;
+            font-size: 1.5em;
+            text-align: center;
+        }
+        #firstVisitPopup p {
+            margin: 0 0 15px 0;
+            font-size: 1em;
+            line-height: 1.4;
+            text-align: center;
+        }
+        #firstVisitPopup ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 15px 0;
+            text-align: center;
+        }
+        #firstVisitPopup li {
+            margin: 10px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        #firstVisitPopup .icon {
+            height: 1em;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        #closePopup {
+            padding: 5px 15px;
+            font-size: 1em;
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #closePopup:hover {
+            background-color: #34495e;
+        }
+        .black-background::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 1);
+            z-index: 999;
+            transition: opacity 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -241,7 +312,7 @@
     <div class="container">
         <h1 id="routeTitle">DSO 2 to HQ in</h1>
         <div id="countdown">00:00</div>
-        <div id="nextBus">Next bus at --:--</div>
+        <div id="nextBus">Next bus at: --:--</div>
         <div class="progress-container">
             <div class="progress-bar">
                 <div class="progress-fill" id="progressFill"></div>
@@ -264,6 +335,26 @@
         <path id="dunePath" fill="rgba(237, 201, 175, 0.4)" />
     </svg>
     <div class="stars-container" id="starsContainer"></div>
+
+    <!-- Popup for first visit -->
+    <div id="firstVisitPopup">
+        <h2>Add to Home Screen</h2>
+        <p>To install this app on your iPhone:</p>
+        <ul>
+            <li>
+                <img src="https://cdn-icons-png.flaticon.com/128/4855/4855052.png" alt="Share Icon" class="icon">
+                Tap the "Share" button in Safari
+            </li>
+            <li>
+                <img src="https://cdn-icons-png.flaticon.com/128/3161/3161837.png" alt="Add to Home Screen Icon" class="icon">
+                Select "Add to Home Screen"
+            </li>
+            <li>
+                Tap "Add" in the top-right corner
+            </li>
+        </ul>
+        <button id="closePopup">Close</button>
+    </div>
 
     <script>
         let dunePoints = [];
@@ -384,23 +475,22 @@
 
         function updateSkyAndCelestial() {
             const now = new Date();
-            const utcOffset = 4 * 60; // Offset para Dubai (UTC+4)
-            const dubaiTime = new Date(now.getTime() + utcOffset * 60 * 1000);
-            const hours = dubaiTime.getHours();
-            const minutes = dubaiTime.getMinutes();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
             const totalMinutes = hours * 60 + minutes;
 
             const celestial = document.getElementById('celestialBody');
             const starsContainer = document.getElementById('starsContainer');
             let gradient;
 
-            const sunrise = 6 * 60 + 30;  // 6:30
-            const sunset = 18 * 60 + 30;  // 18:30
-            const moonrise = 18 * 60 + 30; // 18:30
-            const moonset = 6 * 60 + 30;  // 6:30 siguiente día
+            const dayLength = 12 * 60;
+            const sunrise = 6 * 60;
+            const sunset = 18 * 60;
+            const moonrise = sunset;
+            const moonset = sunrise + 1440;
 
-            // Determinar si es día o noche
-            if (totalMinutes >= sunrise && totalMinutes < sunset) {
+            const isDay = totalMinutes >= sunrise && totalMinutes < sunset;
+            if (isDay) {
                 gradient = 'linear-gradient(to bottom, #87cefa, #4682b4)';
                 celestial.textContent = '☀️';
                 starsContainer.style.display = 'none';
@@ -415,35 +505,20 @@
             }
             document.getElementById('background-container').style.background = gradient;
 
-            // Calcular progreso en el semicírculo
-            const periodLength = 12 * 60; // 12 horas en minutos
             let progress;
-
-            if (totalMinutes >= sunrise && totalMinutes < sunset) {
-                // Día: Sol
-                progress = (totalMinutes - sunrise) / periodLength;
+            if (isDay) {
+                progress = (totalMinutes - sunrise) / dayLength;
             } else {
-                // Noche: Luna
-                const nightMinutes = totalMinutes < sunrise ? totalMinutes + 1440 : totalMinutes;
-                progress = (nightMinutes - moonrise) / periodLength;
+                const adjustedMinutes = totalMinutes < sunrise ? totalMinutes + 1440 : totalMinutes;
+                progress = (adjustedMinutes - moonrise) / dayLength;
             }
             progress = Math.max(0, Math.min(1, progress));
 
-            // Definir el semicírculo dentro de los límites visibles
-            const startX = 10;    // 10% desde la izquierda
-            const endX = 90;      // 90% desde la izquierda (dentro de la pantalla)
-            const radiusX = (endX - startX) / 2; // Radio horizontal
-            const centerX = startX + radiusX;
-            const startY = 70;    // 70% desde la parte superior (justo encima de las dunas)
-            const maxHeight = 20; // 20% desde la parte superior (punto más alto)
+            const xPos = 5 + progress * 90;
+            const yPos = 90 - 80 * 4 * progress * (1 - progress);
 
-            const angle = progress * Math.PI; // 0 a π (180 grados)
-            const leftPosition = centerX + radiusX * Math.sin(angle); // Movimiento horizontal
-            const topPosition = startY - (startY - maxHeight) * Math.cos(angle); // Movimiento vertical
-
-            // Aplicar posición asegurando que esté dentro de la pantalla
-            celestial.style.left = `${Math.max(0, Math.min(100, leftPosition))}%`;
-            celestial.style.top = `${Math.max(0, Math.min(100, topPosition))}%`;
+            celestial.style.left = `${xPos}vw`;
+            celestial.style.top = `${yPos}vh`;
             celestial.style.display = 'block';
         }
 
@@ -504,8 +579,8 @@
                 const y = Math.random() * 75;
                 const size = Math.random() * 3 + 1;
 
-                star.style.left = `${x}%`;
-                star.style.top = `${y}%`;
+                star.style.left = `${x}vw`;
+                star.style.top = `${y}vh`;
                 star.style.width = `${size}px`;
                 star.style.height = `${size}px`;
 
@@ -534,7 +609,7 @@
         function findClosestBusTimes(inputTime) {
             const [inputHours, inputMinutes] = inputTime.split(':').map(Number);
             const targetTimeInMinutes = inputHours * 60 + inputMinutes;
-            const maxDelayMinutes = 55; // 55 minutos como solicitado
+            const maxDelayMinutes = 55;
 
             const schedule = grosvenorToHQSchedule.map(item => ({
                 gros: item.gros,
@@ -596,11 +671,28 @@
             document.querySelector('.input-container').style.display = 'flex';
         });
 
+        // Popup logic with black background
+        function showFirstVisitPopup() {
+            if (!localStorage.getItem('hasVisited')) {
+                const popup = document.getElementById('firstVisitPopup');
+                popup.style.display = 'block';
+                document.body.classList.add('black-background');
+            }
+        }
+
+        document.getElementById('closePopup').addEventListener('click', function() {
+            const popup = document.getElementById('firstVisitPopup');
+            popup.style.display = 'none';
+            document.body.classList.remove('black-background');
+            localStorage.setItem('hasVisited', 'true');
+        });
+
         window.onload = function() {
             generateRandomDune();
             window.scrollTo(0, 0);
             updateSkyAndCelestial();
             updateCountdown();
+            showFirstVisitPopup();
         };
 
         setInterval(updateCountdown, 100);
