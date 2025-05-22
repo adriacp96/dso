@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>DSO</title>
+    <title>DSO 2</title>
     <link rel="apple-touch-icon" href="https://i.imghippo.com/files/tEG3031vlA.png">
     <link rel="apple-touch-startup-image" href="https://example.com/splash.png">
     <style>
@@ -313,7 +313,7 @@
     <img src="https://upload.wikimedia.org/wikipedia/commons/archive/d/d0/20250508163912%21Emirates_logo.svg" 
          alt="Emirates Logo" class="emirates-logo">
     <div class="container">
-        <h1 id="routeTitle">DSO 2 to HQ in</h1>
+        <h1 id="routeTitle">Grosvenor to HQ in</h1>
         <div id="countdown">00:00</div>
         <div id="nextBus">Next bus at: --:--</div>
         <div class="progress-container">
@@ -360,7 +360,7 @@
         let starsCreated = false;
 
         const grosvenorToHQSchedule = [
-            { gros: "0:29", hq: "1:05" }, { gros: "0:44", hq: "1:40" }, { gros: "0:59", hq: "1:35" },
+            { gros: "0:29", hq: "1:05" }, { gros: "0:44", hq: "1:20" }, { gros: "0:59", hq: "1:35" },
             { gros: "1:14", hq: "1:50" }, { gros: "1:24", hq: "2:00" }, { gros: "1:39", hq: "2:15" },
             { gros: "1:54", hq: "2:30" }, { gros: "2:09", hq: "2:45" }, { gros: "2:24", hq: "3:00" },
             { gros: "2:44", hq: "3:20" }, { gros: "3:14", hq: "3:50" }, { gros: "3:44", hq: "4:20" },
@@ -370,20 +370,21 @@
             { gros: "6:39", hq: "7:19" }, { gros: "6:54", hq: "7:34" }, { gros: "7:14", hq: "7:54" },
             { gros: "7:29", hq: "8:09" }, { gros: "7:49", hq: "8:29" }, { gros: "8:09", hq: "8:49" },
             { gros: "8:24", hq: "9:04" }, { gros: "8:44", hq: "9:24" }, { gros: "9:04", hq: "9:44" },
-            { gros: "9:24", hq: "10:04" }, { gros: "10:14", hq: "10:54" }, { gros: "10:44", hq: "11:24" },
-            { gros: "11:04", hq: "11:44" }, { gros: "11:24", hq: "12:04" }, { gros: "11:39", hq: "12:19" },
-            { gros: "12:04", hq: "12:44" }, { gros: "12:19", hq: "12:59" }, { gros: "12:39", hq: "13:19" },
-            { gros: "12:54", hq: "13:34" }, { gros: "13:19", hq: "13:59" }, { gros: "13:44", hq: "14:24" },
-            { gros: "14:04", hq: "14:44" }, { gros: "14:29", hq: "15:09" }, { gros: "14:54", hq: "15:34" },
-            { gros: "15:19", hq: "15:59" }, { gros: "15:44", hq: "16:24" }, { gros: "16:09", hq: "16:52" },
-            { gros: "16:39", hq: "17:22" }, { gros: "17:39", hq: "17:52" }, { gros: "17:39", hq: "18:22" },
-            { gros: "18:04", hq: "18:47" }, { gros: "18:34", hq: "19:17" }, { gros: "19:04", hq: "19:47" },
-            { gros: "19:34", hq: "20:17" }, { gros: "20:04", hq: "20:47" }, { gros: "20:29", hq: "21:09" },
-            { gros: "20:54", hq: "21:34" }, { gros: "21:19", hq: "21:59" }, { gros: "21:39", hq: "22:19" },
-            { gros: "22:04", hq: "22:44" }, { gros: "22:29", hq: "23:09" }, { gros: "22:49", hq: "23:29" },
-            { gros: "23:04", hq: "23:44" }, { gros: "23:29", hq: "0:09" }, { gros: "23:44", hq: "0:24" },
-            { gros: "23:59", hq: "0:39" }, { gros: "0:14", hq: "0:50" }
+            { gros: "9:24", hq: "10:04" }, { gros: "9:44", hq: "10:24" }, { gros: "10:14", hq: "10:54" },
+            { gros: "10:44", hq: "11:24" }, { gros: "11:04", hq: "11:44" }, { gros: "11:24", hq: "12:04" },
+            { gros: "11:39", hq: "12:19" }, { gros: "12:04", hq: "12:44" }, { gros: "12:19", hq: "12:59" },
+            { gros: "12:39", hq: "13:19" }, { gros: "12:54", hq: "13:34" }, { gros: "13:19", hq: "13:59" },
+            { gros: "13:44", hq: "14:24" }, { gros: "14:04", hq: "14:44" }, { gros: "14:29", hq: "15:09" },
+            { gros: "14:54", hq: "15:34" }, { gros: "15:19", hq: "15:59" }, { gros: "15:44", hq: "16:24" },
+            { gros: "16:09", hq: "16:52" }, { gros: "16:39", hq: "17:22" }, { gros: "17:09", hq: "17:52" },
+            { gros: "17:39", hq: "18:22" }, { gros: "18:04", hq: "18:47" }, { gros: "18:34", hq: "19:17" },
+            { gros: "19:04", hq: "19:47" }, { gros: "19:34", hq: "20:17" }, { gros: "20:04", hq: "20:47" },
+            { gros: "20:29", hq: "21:09" }, { gros: "20:54", hq: "21:34" }, { gros: "21:19", hq: "21:59" },
+            { gros: "21:39", hq: "22:19" }, { gros: "22:04", hq: "22:44" }, { gros: "22:29", hq: "23:09" },
+            { gros: "22:49", hq: "23:29" }, { gros: "23:04", hq: "23:44" }, { gros: "23:29", hq: "0:09" },
+            { gros: "23:44", hq: "0:24" }, { gros: "23:59", hq: "0:39" }, { gros: "0:14", hq: "0:50" }
         ];
+
 
         const hqToGrosvenorSchedule = [
             { hq: "0:00", gros: "0:29" }, { hq: "0:15", gros: "0:44" }, { hq: "0:30", gros: "0:59" },
@@ -391,18 +392,18 @@
             { hq: "1:25", gros: "1:54" }, { hq: "1:40", gros: "2:09" }, { hq: "1:55", gros: "2:24" },
             { hq: "2:15", gros: "2:44" }, { hq: "2:45", gros: "3:14" }, { hq: "3:15", gros: "3:44" },
             { hq: "3:45", gros: "4:14" }, { hq: "4:15", gros: "4:44" }, { hq: "4:25", gros: "4:54" },
-            { hq: "4:50", gros: "5:04" }, { hq: "4:55", gros: "5:19" }, { hq: "5:10", gros: "5:39" },
+            { hq: "4:35", gros: "5:04" }, { hq: "4:50", gros: "5:19" }, { hq: "5:10", gros: "5:39" },
             { hq: "5:25", gros: "5:54" }, { hq: "5:40", gros: "6:09" }, { hq: "5:50", gros: "6:19" },
             { hq: "6:10", gros: "6:39" }, { hq: "6:25", gros: "6:54" }, { hq: "6:45", gros: "7:14" },
             { hq: "7:00", gros: "7:29" }, { hq: "7:20", gros: "7:49" }, { hq: "7:40", gros: "8:09" },
-            { hq: "7:55", gros: "8:24" }, { hq: "8:15", gros: "8:44" }, { hq: "8:55", gros: "9:04" },
+            { hq: "7:55", gros: "8:24" }, { hq: "8:15", gros: "8:44" }, { hq: "8:35", gros: "9:04" },
             { hq: "8:55", gros: "9:24" }, { hq: "9:15", gros: "9:44" }, { hq: "9:45", gros: "10:14" },
             { hq: "10:15", gros: "10:44" }, { hq: "10:35", gros: "11:04" }, { hq: "10:55", gros: "11:24" },
             { hq: "11:10", gros: "11:39" }, { hq: "11:35", gros: "12:04" }, { hq: "11:50", gros: "12:19" },
             { hq: "12:10", gros: "12:39" }, { hq: "12:25", gros: "12:54" }, { hq: "12:50", gros: "13:19" },
             { hq: "13:15", gros: "13:44" }, { hq: "13:35", gros: "14:04" }, { hq: "14:00", gros: "14:29" },
             { hq: "14:25", gros: "14:54" }, { hq: "14:50", gros: "15:19" }, { hq: "15:15", gros: "15:44" },
-            { hq: "15:40", gros: "16:09" }, { hq: "16:10", gros: "16:39" }, { hq: "16:40", gros: "17:39" },
+            { hq: "15:40", gros: "16:09" }, { hq: "16:10", gros: "16:39" }, { hq: "16:40", gros: "17:09" },
             { hq: "17:10", gros: "17:39" }, { hq: "17:35", gros: "18:04" }, { hq: "18:05", gros: "18:34" },
             { hq: "18:35", gros: "19:04" }, { hq: "19:05", gros: "19:34" }, { hq: "19:35", gros: "20:04" },
             { hq: "20:00", gros: "20:29" }, { hq: "20:25", gros: "20:54" }, { hq: "20:50", gros: "21:19" },
@@ -410,6 +411,7 @@
             { hq: "22:20", gros: "22:49" }, { hq: "22:35", gros: "23:04" }, { hq: "23:00", gros: "23:29" },
             { hq: "23:15", gros: "23:44" }, { hq: "23:30", gros: "23:59" }, { hq: "23:45", gros: "0:14" }
         ];
+
 
 
         function getBusTimes() {
