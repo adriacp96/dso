@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>DSO 2</title>
+    <title>DSO</title>
     <link rel="apple-touch-icon" href="https://i.imghippo.com/files/tEG3031vlA.png">
     <link rel="apple-touch-startup-image" href="https://example.com/splash.png">
     <style>
@@ -356,10 +356,10 @@
     </div>
 
     <script>
-        let isDSO 2ToHQ = true;
+        let isGrosvenorToHQ = true;
         let starsCreated = false;
 
-        const DSO 2ToHQSchedule = [
+        const grosvenorToHQSchedule = [
             { gros: "0:29", hq: "1:05" }, { gros: "0:44", hq: "1:40" }, { gros: "0:59", hq: "1:35" },
             { gros: "1:14", hq: "1:50" }, { gros: "1:24", hq: "2:00" }, { gros: "1:39", hq: "2:15" },
             { gros: "1:54", hq: "2:30" }, { gros: "2:09", hq: "2:45" }, { gros: "2:24", hq: "3:00" },
@@ -385,7 +385,7 @@
             { gros: "23:59", hq: "0:39" }, { gros: "0:14", hq: "0:50" }
         ];
 
-        const hqToDSO 2Schedule = [
+        const hqToGrosvenorSchedule = [
             { hq: "0:00", gros: "0:29" }, { hq: "0:15", gros: "0:44" }, { hq: "0:30", gros: "0:59" },
             { hq: "0:45", gros: "1:14" }, { hq: "0:55", gros: "1:24" }, { hq: "1:10", gros: "1:39" },
             { hq: "1:25", gros: "1:54" }, { hq: "1:40", gros: "2:09" }, { hq: "1:55", gros: "2:24" },
@@ -413,7 +413,7 @@
 
 
         function getBusTimes() {
-            const currentSchedule = isDSO 2ToHQ ? DSO 2ToHQSchedule.map(item => item.gros) : hqToDSO 2Schedule;
+            const currentSchedule = isGrosvenorToHQ ? grosvenorToHQSchedule.map(item => item.gros) : hqToGrosvenorSchedule;
             const now = new Date();
             const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes() + (now.getSeconds() + now.getMilliseconds() / 1000) / 60;
             let previousBus = { time: currentSchedule[currentSchedule.length - 1], minutes: 0 };
@@ -605,11 +605,11 @@
         }
 
         document.getElementById('toggleRoute').addEventListener('click', function() {
-            isDSO 2ToHQ = !isDSO 2ToHQ;
+            isGrosvenorToHQ = !isGrosvenorToHQ;
             const routeTitle = document.getElementById('routeTitle');
             const toggleButton = document.getElementById('toggleRoute');
             
-            if (isDSO 2ToHQ) {
+            if (isGrosvenorToHQ) {
                 routeTitle.textContent = "DSO 2 to HQ in";
                 toggleButton.textContent = "🔄";
             } else {
@@ -624,7 +624,7 @@
             const targetTimeInMinutes = inputHours * 60 + inputMinutes;
             const maxDelayMinutes = 50;
 
-            const schedule = DSO 2ToHQSchedule.map(item => ({
+            const schedule = grosvenorToHQSchedule.map(item => ({
                 gros: item.gros,
                 hq: item.hq,
                 grosMinutes: item.gros.split(':').map(Number)[0] * 60 + item.gros.split(':').map(Number)[1],
