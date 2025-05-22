@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>DSO</title>
+    <title>DSO 2</title>
     <link rel="apple-touch-icon" href="https://i.imghippo.com/files/tEG3031vlA.png">
     <link rel="apple-touch-startup-image" href="https://example.com/splash.png">
     <style>
@@ -33,9 +33,10 @@
             background-size: cover;
             background-attachment: fixed;
             z-index: 0;
+            transition: background 5s ease;
         }
         body {
-            font-family: 'Emirates Bold', Helvetica, Arial, sans-serif;
+            font-family: 'Emirates Bold';
             margin: 0;
             padding: 0;
             height: 100vh;
@@ -111,21 +112,25 @@
             transform: scaleX(-1);
             transition: left 0.5s linear;
         }
+        .dune {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 25vh;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+        .dune-gradient {
+            fill: url(#duneGradient);
+        }
         #celestialBody {
             font-size: 60px;
             position: absolute;
             transition: none;
             z-index: 1;
             opacity: 1;
-            pointer-events: none;
-        }
-        .dunes {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 25vh;
-            z-index: 1;
             pointer-events: none;
         }
         .button-container {
@@ -179,7 +184,7 @@
             gap: 10px;
         }
         .input-container span {
-            font-family: 'Emirates Bold', sans-serif;
+            font-family: 'Emirates Bold';
             font-size: 1.2em;
             color: #2c3e50;
         }
@@ -216,7 +221,7 @@
         #eGateButton {
             padding: 0 20px;
             font-size: 1.2em;
-            font-family: 'Emirates Bold', sans-serif;
+            font-family: 'Emirates Bold';
             background: white;
             color: #2c3e50;
             border: none;
@@ -232,7 +237,6 @@
         #eGateButton:hover {
             transform: scale(1.05);
         }
-        /* Popup Styles */
         #firstVisitPopup {
             display: none;
             position: fixed;
@@ -330,12 +334,8 @@
         <div id="closestTimes"></div>
     </div>
     <div id="celestialBody">☀️</div>
-    <svg class="dunes" viewBox="0 0 1000 250" preserveAspectRatio="none">
-        <path id="dunePath" fill="rgba(237, 201, 175, 0.4)" />
-    </svg>
     <div class="stars-container" id="starsContainer"></div>
 
-    <!-- Popup for first visit -->
     <div id="firstVisitPopup">
         <h2>Add to Home Screen</h2>
         <p>To install this app on your iPhone:</p>
@@ -356,11 +356,10 @@
     </div>
 
     <script>
-        let dunePoints = [];
-        let isGrosvenorToHQ = true;
+        let isDSO 2ToHQ = true;
         let starsCreated = false;
 
-        const grosvenorToHQSchedule = [
+        const DSO 2ToHQSchedule = [
             { gros: "0:29", hq: "1:05" }, { gros: "0:44", hq: "1:40" }, { gros: "0:59", hq: "1:35" },
             { gros: "1:14", hq: "1:50" }, { gros: "1:24", hq: "2:00" }, { gros: "1:39", hq: "2:15" },
             { gros: "1:54", hq: "2:30" }, { gros: "2:09", hq: "2:45" }, { gros: "2:24", hq: "3:00" },
@@ -386,7 +385,7 @@
             { gros: "23:59", hq: "0:39" }, { gros: "0:14", hq: "0:50" }
         ];
 
-        const hqToGrosvenorSchedule = [
+        const hqToDSO 2Schedule = [
             { hq: "0:00", gros: "0:29" }, { hq: "0:15", gros: "0:44" }, { hq: "0:30", gros: "0:59" },
             { hq: "0:45", gros: "1:14" }, { hq: "0:55", gros: "1:24" }, { hq: "1:10", gros: "1:39" },
             { hq: "1:25", gros: "1:54" }, { hq: "1:40", gros: "2:09" }, { hq: "1:55", gros: "2:24" },
@@ -412,51 +411,9 @@
             { hq: "23:15", gros: "23:44" }, { hq: "23:30", gros: "23:59" }, { hq: "23:45", gros: "0:14" }
         ];
 
-        function generateRandomDune() {
-            const segments = 4;
-            const width = 1000;
-            const segmentWidth = width / segments;
-            let path = "M0,250";
-            dunePoints = [{ x: 0, y: 250 }];
-
-            for (let i = 1; i <= segments; i++) {
-                const x1 = (i - 0.66) * segmentWidth;
-                const y1 = 250 - Math.random() * 130;
-                const x2 = (i - 0.33) * segmentWidth;
-                const y2 = 250 - Math.random() * 130;
-                const x3 = i * segmentWidth;
-                const y3 = i === segments ? 250 : 250 - Math.random() * 130;
-
-                path += ` C${x1},${y1} ${x2},${y2} ${x3},${y3}`;
-                dunePoints.push({ x: x1, y: y1 }, { x: x2, y: y2 }, { x: x3, y: y3 });
-            }
-
-            path += " L0,250 Z";
-            document.getElementById("dunePath").setAttribute("d", path);
-        }
-
-        function getBezierY(t, p0, p1, p2, p3) {
-            const mt = 1 - t;
-            return Math.pow(mt, 3) * p0.y + 3 * Math.pow(mt, 2) * t * p1.y + 
-                   3 * mt * Math.pow(t, 2) * p2.y + Math.pow(t, 3) * p3.y;
-        }
-
-        function getDuneHeight(x) {
-            for (let i = 0; i < dunePoints.length - 3; i += 3) {
-                const p0 = dunePoints[i];
-                const p1 = dunePoints[i + 1];
-                const p2 = dunePoints[i + 2];
-                const p3 = dunePoints[i + 3];
-                if (x >= p0.x && x <= p3.x) {
-                    const t = (x - p0.x) / (p3.x - p0.x);
-                    return getBezierY(t, p0, p1, p2, p3);
-                }
-            }
-            return 250;
-        }
 
         function getBusTimes() {
-            const currentSchedule = isGrosvenorToHQ ? grosvenorToHQSchedule.map(item => item.gros) : hqToGrosvenorSchedule.map(item => item.hq);
+            const currentSchedule = isDSO 2ToHQ ? DSO 2ToHQSchedule.map(item => item.gros) : hqToDSO 2Schedule;
             const now = new Date();
             const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes() + (now.getSeconds() + now.getMilliseconds() / 1000) / 60;
             let previousBus = { time: currentSchedule[currentSchedule.length - 1], minutes: 0 };
@@ -489,53 +446,94 @@
         }
 
         function updateSkyAndCelestial() {
-            const now = new Date();
-            const hours = now.getHours();
-            const minutes = now.getMinutes();
-            const totalMinutes = hours * 60 + minutes;
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const totalMinutes = hours * 60 + minutes;
 
-            const celestial = document.getElementById('celestialBody');
-            const starsContainer = document.getElementById('starsContainer');
-            let gradient;
+    const celestial = document.getElementById('celestialBody');
+    const starsContainer = document.getElementById('starsContainer');
+    let gradient;
 
-            const dayLength = 12 * 60;
-            const sunrise = 6 * 60;
-            const sunset = 18 * 60;
-            const moonrise = sunset;
-            const moonset = sunrise + 1440;
+    // Define time periods (in minutes since midnight)
+    const sunriseStart = 5 * 60; // 5:00 AM
+    const sunriseEnd = 7 * 60; // 7:00 AM
+    const dayEnd = 17 * 60; // 5:00 PM
+    const sunsetEnd = 19 * 60; // 7:00 PM
+    const dayLength = 12 * 60; // For celestial movement
 
-            const isDay = totalMinutes >= sunrise && totalMinutes < sunset;
-            if (isDay) {
-                gradient = 'linear-gradient(to bottom, #87cefa, #4682b4)';
-                celestial.textContent = '☀️';
-                starsContainer.style.display = 'none';
-            } else {
-                gradient = 'linear-gradient(to bottom, #191970, #000080)';
-                celestial.textContent = '🌙';
-                starsContainer.style.display = 'block';
-                if (!starsCreated) {
-                    createStars();
-                    starsCreated = true;
-                }
-            }
-            document.getElementById('background-container').style.background = gradient;
+    // Helper function to interpolate between two colors
+    function interpolateColor(color1, color2, factor) {
+        const result = color1.slice(1).match(/.{2}/g).map((hex, i) => {
+            const c1 = parseInt(hex, 16);
+            const c2 = parseInt(color2.slice(1).match(/.{2}/g)[i], 16);
+            const value = Math.round(c1 + (c2 - c1) * factor);
+            return value.toString(16).padStart(2, '0');
+        });
+        return `#${result.join('')}`;
+    }
 
-            let progress;
-            if (isDay) {
-                progress = (totalMinutes - sunrise) / dayLength;
-            } else {
-                const adjustedMinutes = totalMinutes < sunrise ? totalMinutes + 1440 : totalMinutes;
-                progress = (adjustedMinutes - moonrise) / dayLength;
-            }
-            progress = Math.max(0, Math.min(1, progress));
-
-            const xPos = 5 + progress * 90;
-            const yPos = 90 - 80 * 4 * progress * (1 - progress);
-
-            celestial.style.left = `${xPos}vw`;
-            celestial.style.top = `${yPos}vh`;
-            celestial.style.display = 'block';
+    // Determine time period and set gradient
+    if (totalMinutes >= sunriseStart && totalMinutes < sunriseEnd) {
+        // Sunrise: Warm orange, pink, yellow
+        const factor = (totalMinutes - sunriseStart) / (sunriseEnd - sunriseStart);
+        const topColor = interpolateColor('#ff4500', '#ffd700', factor); // Orange to yellow
+        const bottomColor = interpolateColor('#ff69b4', '#87ceeb', factor); // Pink to light blue
+        gradient = `linear-gradient(to bottom, ${topColor}, ${bottomColor})`;
+        celestial.textContent = '☀️';
+        starsContainer.style.display = 'none';
+    } else if (totalMinutes >= sunriseEnd && totalMinutes < dayEnd) {
+        // Daytime: Bright blue tones
+        const factor = (totalMinutes - sunriseEnd) / (dayEnd - sunriseEnd);
+        const topColor = interpolateColor('#87ceeb', '#4682b4', factor); // Light to medium blue
+        const bottomColor = interpolateColor('#b0e0e6', '#1e90ff', factor); // Cyan to deep blue
+        gradient = `linear-gradient(to bottom, ${topColor}, ${bottomColor})`;
+        celestial.textContent = '☀️';
+        starsContainer.style.display = 'none';
+    } else if (totalMinutes >= dayEnd && totalMinutes < sunsetEnd) {
+        // Sunset: Reddish, golden, purple
+        const factor = (totalMinutes - dayEnd) / (sunsetEnd - dayEnd);
+        const topColor = interpolateColor('#ffd700', '#ff4500', factor); // Yellow to orange-red
+        const bottomColor = interpolateColor('#ff8c00', '#4b0082', factor); // Orange to indigo
+        gradient = `linear-gradient(to bottom, ${topColor}, ${bottomColor})`;
+        celestial.textContent = '☀️';
+        starsContainer.style.display = 'none';
+    } else {
+        // Night: Deep blue and indigo
+        const factor = ((totalMinutes < sunriseStart ? totalMinutes + 1440 : totalMinutes) - sunsetEnd) / (sunriseStart + 1440 - sunsetEnd);
+        const topColor = interpolateColor('#191970', '#000033', factor); // Midnight blue to darker blue
+        const bottomColor = interpolateColor('#000080', '#1c2526', factor); // Navy to dark teal
+        gradient = `linear-gradient(to bottom, ${topColor}, ${bottomColor})`;
+        celestial.textContent = '🌙';
+        starsContainer.style.display = 'block';
+        if (!starsCreated) {
+            createStars();
+            starsCreated = true;
         }
+    }
+
+    // Apply gradient with smooth transition
+    const backgroundContainer = document.getElementById('background-container');
+    backgroundContainer.style.transition = 'background 5s ease';
+    backgroundContainer.style.background = gradient;
+
+    // Update celestial body position
+    let progress;
+    if (totalMinutes >= sunriseStart && totalMinutes < sunsetEnd) {
+        progress = (totalMinutes - sunriseStart) / (sunsetEnd - sunriseStart);
+    } else {
+        const adjustedMinutes = totalMinutes < sunriseStart ? totalMinutes + 1440 : totalMinutes;
+        progress = (adjustedMinutes - sunsetEnd) / (sunriseStart + 1440 - sunsetEnd);
+    }
+    progress = Math.max(0, Math.min(1, progress));
+
+    const xPos = 5 + progress * 90;
+    const yPos = 90 - 80 * 4 * progress * (1 - progress);
+
+    celestial.style.left = `${xPos}vw`;
+    celestial.style.top = `${yPos}vh`;
+    celestial.style.display = 'block';
+}
 
         function updateCountdown() {
             const now = new Date();
@@ -607,11 +605,11 @@
         }
 
         document.getElementById('toggleRoute').addEventListener('click', function() {
-            isGrosvenorToHQ = !isGrosvenorToHQ;
+            isDSO 2ToHQ = !isDSO 2ToHQ;
             const routeTitle = document.getElementById('routeTitle');
             const toggleButton = document.getElementById('toggleRoute');
             
-            if (isGrosvenorToHQ) {
+            if (isDSO 2ToHQ) {
                 routeTitle.textContent = "DSO 2 to HQ in";
                 toggleButton.textContent = "🔄";
             } else {
@@ -624,9 +622,9 @@
         function findClosestBusTimes(inputTime) {
             const [inputHours, inputMinutes] = inputTime.split(':').map(Number);
             const targetTimeInMinutes = inputHours * 60 + inputMinutes;
-            const maxDelayMinutes = 55;
+            const maxDelayMinutes = 50;
 
-            const schedule = grosvenorToHQSchedule.map(item => ({
+            const schedule = DSO 2ToHQSchedule.map(item => ({
                 gros: item.gros,
                 hq: item.hq,
                 grosMinutes: item.gros.split(':').map(Number)[0] * 60 + item.gros.split(':').map(Number)[1],
@@ -686,9 +684,10 @@
             document.querySelector('.input-container').style.display = 'flex';
         });
 
-        // Popup logic with black background
         function showFirstVisitPopup() {
-            if (!localStorage.getItem('hasVisited')) {
+            const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            if (!localStorage.getItem('hasVisited') && !isPWA && isIOS) {
                 const popup = document.getElementById('firstVisitPopup');
                 popup.style.display = 'block';
                 document.body.classList.add('black-background');
@@ -703,14 +702,319 @@
         });
 
         window.onload = function() {
-            generateRandomDune();
             window.scrollTo(0, 0);
             updateSkyAndCelestial();
             updateCountdown();
             showFirstVisitPopup();
+            const now = new Date();
+            if (now.getHours() < 6 || now.getHours() >= 18) {
+                createStars();
+            }
         };
 
-        setInterval(updateCountdown, 100);
+        let intervalId = null;
+        function startUpdateLoop() {
+            if (intervalId) clearInterval(intervalId);
+            intervalId = setInterval(updateCountdown, 100);
+        }
+
+        startUpdateLoop();
+
+        document.body.addEventListener('touchmove', function(event) {
+            if (!event.target.closest('#events-container')) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+
+        const calendarWindow = document.getElementById('calendar-window');
+        const calendarTitleBar = document.getElementById('title-bar');
+        const calendarToggleDayButton = document.getElementById('toggle-day');
+        const calendarEventsList = document.getElementById('events-list');
+        const calendarCurrentDate = document.getElementById('current-date');
+        const calendarTitle = document.getElementById('title');
+
+        const calendarUrl = 'https://p108-caldav.icloud.com/published/2/MTUxMDYwNTYxNDE1MTA2MOcLt9DeC6aDOBzlZCUDejDdugx2IBT9HDhJA6jGIXwDHsR2_c0JH71EnIqBSkhBPTX-OE44UuANI0LecwDIOcg';
+
+        let isCalendarDragging = false;
+        let currentCalendarX;
+        let currentCalendarY;
+        let initialCalendarX;
+        let initialCalendarY;
+        let showingToday = true;
+
+        function initCalendarDraggable() {
+            calendarTitleBar.addEventListener('mousedown', startCalendarDragging);
+            document.addEventListener('mousemove', dragCalendar);
+            document.addEventListener('mouseup', stopCalendarDragging);
+            calendarTitleBar.addEventListener('touchstart', startCalendarDragging, { passive: false });
+            document.addEventListener('touchmove', dragCalendar, { passive: false });
+            document.addEventListener('touchend', stopCalendarDragging);
+            calendarToggleDayButton.addEventListener('click', toggleCalendarDay);
+        }
+
+        function startCalendarDragging(e) {
+            if (e.type === 'touchstart') {
+                e.preventDefault();
+            }
+            let clientX, clientY;
+            if (e.type === 'mousedown') {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            } else if (e.type === 'touchstart' && e.touches.length === 1) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                return;
+            }
+            const rect = calendarWindow.getBoundingClientRect();
+            initialCalendarX = clientX - rect.left;
+            initialCalendarY = clientY - rect.top;
+            if (e.target === calendarTitleBar || e.target === calendarTitle) {
+                isCalendarDragging = true;
+                calendarWindow.style.cursor = 'move';
+                calendarWindow.style.transform = 'none';
+            }
+        }
+
+        function dragCalendar(e) {
+            if (isCalendarDragging) {
+                e.preventDefault();
+                let clientX, clientY;
+                if (e.type === 'mousemove') {
+                    clientX = e.clientX;
+                    clientY = e.clientY;
+                } else if (e.type === 'touchmove' && e.touches.length === 1) {
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
+                } else {
+                    return;
+                }
+                currentCalendarX = clientX - initialCalendarX;
+                currentCalendarY = clientY - initialCalendarY;
+                const maxX = window.innerWidth - calendarWindow.offsetWidth;
+                const maxY = window.innerHeight - calendarWindow.offsetHeight;
+                currentCalendarX = Math.min(Math.max(0, currentCalendarX), maxX);
+                currentCalendarY = Math.min(Math.max(0, currentCalendarY), maxY);
+                calendarWindow.style.left = currentCalendarX + 'px';
+                calendarWindow.style.top = currentCalendarY + 'px';
+            }
+        }
+
+        function stopCalendarDragging() {
+            if (isCalendarDragging) {
+                isCalendarDragging = false;
+                calendarWindow.style.cursor = 'default';
+            }
+        }
+
+        function updateCalendarDate() {
+            const dateElement = calendarCurrentDate;
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const date = showingToday ? new Date() : new Date(Date.now() + 24 * 60 * 60 * 1000);
+            dateElement.textContent = date.toLocaleDateString(navigator.language || 'en-US', options);
+            calendarTitle.textContent = showingToday ? "Today's Events" : "Tomorrow's Events";
+            calendarToggleDayButton.textContent = showingToday ? "Tomorrow ➡️" : "Today ⬅️";
+        }
+
+        function formatCalendarTime(date) {
+            if (!(date instanceof Date) || isNaN(date)) {
+                return 'Invalid time';
+            }
+            return date.toLocaleTimeString(navigator.language || 'en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            });
+        }
+
+        async function fetchCalendarEvents() {
+            calendarEventsList.innerHTML = '<div class="loading">Loading events...</div>';
+            try {
+                const proxyUrl = 'https://api.allorigins.win/raw?url=';
+                const response = await fetch(proxyUrl + encodeURIComponent(calendarUrl));
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
+                }
+                const icsData = await response.text();
+                if (!icsData) {
+                    throw new Error('Empty response received');
+                }
+                const events = parseICS(icsData);
+                displayCalendarEvents(events);
+            } catch (error) {
+                console.error('Error fetching calendar:', error);
+                calendarEventsList.innerHTML = `<div class="loading">Unable to load events: ${error.message}</div>`;
+            }
+        }
+
+        function parseICS(icsData) {
+            const events = [];
+            const lines = icsData.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+            let currentEvent = null;
+            let currentLine = '';
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i];
+                if (line.startsWith(' ') || line.startsWith('\t')) {
+                    if (currentLine) {
+                        currentLine += line.substring(1);
+                    }
+                    continue;
+                } else {
+                    if (currentLine) {
+                        processICSLine(currentLine, currentEvent);
+                    }
+                    currentLine = line;
+                }
+                if (currentLine.toUpperCase() === 'BEGIN:VEVENT') {
+                    currentEvent = {};
+                    currentLine = '';
+                } else if (currentLine.toUpperCase() === 'END:VEVENT') {
+                    if (currentEvent && currentEvent.dtstart && currentEvent.summary) {
+                        if (!currentEvent.dtend && currentEvent.dtstartIsDate) {
+                            currentEvent.dtend = currentEvent.dtstart;
+                        }
+                        events.push(currentEvent);
+                    }
+                    currentEvent = null;
+                    currentLine = '';
+                }
+            }
+            if (currentLine) {
+                processICSLine(currentLine, currentEvent);
+            }
+            return events;
+        }
+
+        function processICSLine(line, eventObj) {
+            if (!eventObj || !line.includes(':')) return;
+            const [keyPart, ...valueParts] = line.split(':');
+            const value = valueParts.join(':');
+            const keyParts = keyPart.split(';');
+            const key = keyParts[0].toUpperCase();
+            if (key === 'DTSTART') {
+                const parsedDate = parseICSDate(value, keyPart);
+                eventObj.dtstart = parsedDate.date;
+                eventObj.dtstartIsDate = parsedDate.isDate;
+            } else if (key === 'DTEND') {
+                const parsedDate = parseICSDate(value, keyPart);
+                eventObj.dtend = parsedDate.date;
+                eventObj.dtendIsDate = parsedDate.isDate;
+            } else if (key === 'SUMMARY') {
+                eventObj.summary = value.replace(/\\,/g, ',').replace(/\\;/g, ';').replace(/\\n/g, '\n');
+            }
+        }
+
+        function parseICSDate(dateStr, keyPart) {
+            const isDateOnly = keyPart.toUpperCase().includes('VALUE=DATE');
+            const cleanStr = dateStr.replace('T', '').replace('Z', '');
+            const year = parseInt(cleanStr.substr(0, 4), 10);
+            const month = parseInt(cleanStr.substr(4, 2), 10) - 1;
+            const day = parseInt(cleanStr.substr(6, 2), 10);
+            if (isDateOnly) {
+                return { date: new Date(year, month, day), isDate: true };
+            } else {
+                const hour = parseInt(cleanStr.substr(8, 2) || '0', 10);
+                const minute = parseInt(cleanStr.substr(10, 2) || '0', 10);
+                const second = parseInt(cleanStr.substr(12, 2) || '0', 10);
+                if (dateStr.endsWith('Z')) {
+                    return { date: new Date(Date.UTC(year, month, day, hour, minute, second)), isDate: false };
+                } else {
+                    return { date: new Date(year, month, day, hour, minute, second), isDate: false };
+                }
+            }
+        }
+
+        function isCalendarDateSameDay(date, referenceDate) {
+            if (!(date instanceof Date) || isNaN(date)) {
+                return false;
+            }
+            const compareDate = new Date(date);
+            compareDate.setHours(0, 0, 0, 0);
+            const refDate = new Date(referenceDate);
+            refDate.setHours(0, 0, 0, 0);
+            return compareDate.getTime() === refDate.getTime();
+        }
+
+        function displayCalendarEvents(events) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+            const targetDate = showingToday ? today : tomorrow;
+            const filteredEvents = events.filter(event => event.dtstart && isCalendarDateSameDay(event.dtstart, targetDate));
+            if (filteredEvents.length === 0) {
+                calendarEventsList.innerHTML = '<div class="loading">No events scheduled</div>';
+                return;
+            }
+            filteredEvents.sort((a, b) => {
+                if (a.dtstartIsDate && !b.dtstartIsDate) return -1;
+                if (!a.dtstartIsDate && b.dtstartIsDate) return 1;
+                if (a.dtstartIsDate && b.dtstartIsDate) return 0;
+                return a.dtstart.getTime() - b.dtstart.getTime();
+            });
+            calendarEventsList.innerHTML = filteredEvents.map(event => {
+                let timeString = '';
+                if (event.dtstartIsDate) {
+                    timeString = 'All Day';
+                } else {
+                    timeString = formatCalendarTime(event.dtstart);
+                    if (event.dtend && !event.dtendIsDate && event.dtend.getTime() !== event.dtstart.getTime()) {
+                        timeString += ` - ${formatCalendarTime(event.dtend)}`;
+                    }
+                }
+                return `
+                    <div class="event">
+                        <div class="event-title">${event.summary || 'No Title'}</div>
+                        <div class="event-time">${timeString}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleCalendarDay() {
+            const eventsList = calendarEventsList;
+            eventsList.classList.add(showingToday ? 'slide-out-left' : 'slide-out-right');
+            setTimeout(() => {
+                showingToday = !showingToday;
+                updateCalendarDate();
+                fetchCalendarEvents();
+                eventsList.classList.remove(showingToday ? 'slide-out-right' : 'slide-out-left');
+                eventsList.classList.add(showingToday ? 'slide-in-right' : 'slide-in-left');
+                setTimeout(() => {
+                    eventsList.classList.remove('slide-in-left', 'slide-in-right');
+                }, 500);
+            }, 500);
+        }
+
+        function startAutoCycle() {
+            setInterval(toggleCalendarDay, 10000);
+        }
+
+        initCalendarDraggable();
+        updateCalendarDate();
+        fetchCalendarEvents();
+        startAutoCycle();
+
+        setInterval(() => {
+            console.log("Updating calendar...");
+            fetchCalendarEvents();
+        }, 300000);
     </script>
+    <svg class="dune" viewBox="0 0 1000 250" preserveAspectRatio="none">
+    <defs>
+        <linearGradient id="duneGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#f4e4bc;stop-opacity:1" />
+            <stop offset="50%" style="stop-color:#edc9af;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#d2a679;stop-opacity:0.8" />
+        </linearGradient>
+    </defs>
+    <path class="dune-gradient" d="
+        M0,250
+        C120,225 320,130 430,80
+        C540,50 680,110 860,190
+        C930,220 1000,235 1000,250
+        L1000,250
+        L0,250
+        Z" />
+</svg>
 </body>
 </html>
